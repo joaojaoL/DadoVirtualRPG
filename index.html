@@ -15,17 +15,21 @@
         .header h1 { margin: 0; font-family: 'Oswald'; text-transform: uppercase; font-size: 1.5rem; }
         .container { max-width: 800px; width: 95%; background: var(--card); padding: 25px; border: 3px solid var(--red); margin: 20px auto; box-shadow: 10px 10px 0px #000; }
         h2, h3 { font-family: 'Oswald'; text-transform: uppercase; border-bottom: 2px solid var(--red); padding-bottom: 5px; margin-bottom: 15px; }
-        label { display: block; margin-top: 10px; font-weight: bold; color: var(--red); font-size: 0.8rem; }
+        label { display: block; margin-top: 10px; font-weight: bold; color: var(--red); font-size: 0.75rem; text-transform: uppercase; }
         select, input, textarea { padding: 10px; margin: 5px 0; border: 2px solid var(--border); background: #000; color: #fff; width: 100%; font-family: 'Roboto Mono'; outline: none; }
         button { background: var(--red); color: white; border: none; padding: 12px; width: 100%; font-family: 'Oswald'; font-size: 1.1rem; text-transform: uppercase; cursor: pointer; margin-top: 10px; box-shadow: 4px 4px 0px #000; }
         button:hover { background: #ef233c; transform: translate(-1px, -1px); }
-        .room-item { background: #000; border: 2px solid #333; padding: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
-        #rpg-panel { display: none; width: 98%; max-width: 1400px; margin: 0 auto; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 15px; }
+        
+        .ficha-input-box { border: 2px solid #555; background: #000; padding: 15px; margin-bottom: 25px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .full-width { grid-column: span 2; }
+        
+        #rpg-panel { display: none; width: 98%; max-width: 1400px; margin: 0 auto; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 15px; }
         .card { background: var(--card); padding: 20px; border: 2px solid var(--red); }
         .hp-bar-bg { height: 25px; background: #222; border: 1px solid #000; margin: 8px 0; overflow: hidden; }
         .hp-bar-fill { height: 100%; background: var(--red); width: 100%; transition: 0.4s; }
         #chat-box { height: 350px; overflow-y: auto; background: #000; border: 1px solid #333; padding: 10px; font-size: 0.8rem; border-left: 4px solid var(--red); }
-        .master-only { display: none; } /* Escondido por padrão */
+        .master-only { display: none; }
+        #chat-section { display: none; } /* Chat escondido por padrão */
     </style>
 </head>
 <body>
@@ -33,9 +37,9 @@
     <div class="header"><h1>RPG MASTER TACTICAL</h1></div>
 
     <div id="setup-choice" class="container">
-        <h2>Escolha o Modo de Jogo</h2>
+        <h2>Modo de Jogo</h2>
         <button onclick="showLobby()">MODO ONLINE (Firebase)</button>
-        <button onclick="showCasual()" style="background:#2b2d42">MODO CASUAL (Offline)</button>
+        <button onclick="showCasual()" style="background:#2b2d42">MODO CASUAL (Local)</button>
     </div>
 
     <div id="lobby" class="container" style="display:none">
@@ -52,15 +56,15 @@
         <h2>Configuração Casual</h2>
         <label>TEMA</label>
         <select id="casual-style"></select>
-        <label>JOGADORES</label>
+        <label>QUANTIDADE DE JOGADORES</label>
         <input type="number" id="casual-p-count" value="2">
-        <button onclick="setupCasualPlayers()">Configurar Fichas</button>
+        <button onclick="setupCasualPlayers()">Gerar Fichas</button>
     </div>
 
     <div id="step-fichas" class="container" style="display:none">
-        <h2 id="ficha-titulo">Fichas dos Personagens</h2>
+        <h2 id="ficha-titulo">Criação de Personagens</h2>
         <div id="inputs-container"></div>
-        <button onclick="finalizarSetup()">Iniciar Aventura</button>
+        <button onclick="finalizarSetup()">Confirmar e Abrir Painel</button>
     </div>
 
     <div id="rpg-panel">
@@ -69,33 +73,35 @@
             <div id="final-hp-list"></div>
             <div class="master-only">
                 <h3>[NOTAS DO MESTRE]</h3>
-                <textarea id="master-notes" rows="10" placeholder="Segredos da história..."></textarea>
-                <button onclick="salvarNotas()">Sincronizar Notas</button>
+                <textarea id="master-notes" rows="10" placeholder="Anotações privadas..."></textarea>
+                <button onclick="salvarNotas()" id="btn-save-notes">Sincronizar Notas</button>
             </div>
         </div>
 
-        <div class="card">
+        <div class="card" id="chat-section">
             <h3>[CHAT]</h3>
             <div id="chat-box"></div>
             <div style="display:flex; gap:5px; margin-top:5px">
                 <input type="text" id="chat-input" placeholder="Sua fala...">
                 <button onclick="enviarMsg()" style="width:70px; margin:0">OK</button>
             </div>
-            
-            <h3 style="margin-top:20px">[DADOS]</h3>
-            <div class="master-only">
+        </div>
+
+        <div class="card" id="dice-section">
+            <h3>[DADOS]</h3>
+            <div class="master-only-dice">
+                <label>SELECIONAR DADO</label>
                 <select id="dado-seletor">
-                    <option value="4">D4</option><option value="6">D6</option><option value="20" selected>D20</option><option value="100">D100</option>
+                    <option value="20" selected>D20</option><option value="6">D6</option><option value="100">D100</option>
                 </select>
-                <div id="dice-result" style="font-size:3rem; text-align:center; font-family:'Oswald'; color:var(--red)">--</div>
-                <button onclick="rolarDado()">Rolar (Mestre)</button>
+                <div id="dice-result" style="font-size:3rem; text-align:center; font-family:'Oswald'; color:var(--red); border:2px solid #333; margin:10px 0; background:#000">--</div>
+                <button onclick="rolarDado()">Rolar Dado</button>
             </div>
-            <div id="player-dice-msg" style="text-align:center; color:#666; font-size:0.8rem">Apenas o mestre rola dados oficiais.</div>
+            <div id="player-dice-msg" style="text-align:center; color:#666; font-size:0.8rem; margin-top:10px">O mestre controla as rolagens oficiais.</div>
         </div>
     </div>
 
     <script>
-        // FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyA3-yiNczMAF4sdZ9kog4ovXc75fciaN2g",
             authDomain: "meudadovirtualok.firebaseapp.com",
@@ -108,18 +114,17 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        let isOnline = false, isMaster = false, currentRoom = "", myChar = "", currentStyle = "";
+        let isOnline = false, isMaster = false, currentRoom = "", myChar = "", currentStyle = "", localPlayers = [];
 
         const classesData = {
-            jujutsu: ["Feiticeiro Grau 4", "Feiticeiro Grau 3", "Feiticeiro Grau 2", "Feiticeiro Grau 1", "Especial", "Shikigami", "Mestre de Ferramentas", "Receptáculo", "Restrição Celestial", "Usuário de Maldição", "Doutor Reverso", "Invocador", "Prodígio"],
-            onepiece: ["Logia", "Paramecia", "Zoan", "3 Espadas", "Sniper", "Ciborgue", "Navegador", "Cozinheiro", "Arqueólogo", "Músico", "Timoneiro", "Haki Master", "Mink"],
-            jojo: ["Stand Curto", "Stand Longo", "Stand Automático", "Stand Cura", "Stand Colônia", "Stand Independente", "Mestre Hamon", "Vampiro", "Spin User", "Ciborgue", "Stand Precisão", "Stand Força", "Lutador"],
+            jujutsu: ["Feiticeiro Grau 4", "Feiticeiro Grau 1", "Especial", "Restrição Celestial", "Shikigami", "Usuário de Maldição", "Doutor Reverso", "Invocador", "Mestre de Barreiras", "Corpo Amaldiçoado", "Mestre de Ferramentas", "Receptáculo", "Prodígio"],
+            onepiece: ["Logia", "Paramecia", "Zoan", "3 Espadas", "Haki Master", "Mestre de Haki", "Ciborgue", "Navegador", "Sniper", "Cozinheiro", "Arqueólogo", "Músico", "Timoneiro", "Mink"],
+            jojo: ["Stand Curto", "Stand Longo", "Stand Automático", "Stand Cura", "Stand Colônia", "Mestre Hamon", "Vampiro", "Spin User", "Stand Precisão", "Stand Força", "Lutador", "Stand Independente", "Mestre das Sombras"],
             medieval: ["Guerreiro", "Mago", "Ladino", "Bárbaro", "Bardo", "Clérigo", "Druida", "Paladino", "Monge", "Feiticeiro", "Patrulheiro", "Necromante", "Alquimista"],
-            slasher: ["Atleta", "Final Girl", "Nerd", "Popular", "Rebelde", "Xerife", "Sobrevivente", "Palhaço", "Monitor", "Estranho", "Médico", "Motorista", "Investigador"],
+            slasher: ["Final Girl", "Atleta", "Nerd", "Popular", "Xerife", "Sobrevivente", "Palhaço", "Monitor", "Estranho", "Médico", "Investigador", "Motorista", "Rebelde"],
             roça: ["Vaqueiro", "Peão", "Benzedeira", "Fazendeiro", "Mateiro", "Violeiro", "Capataz", "Agrônomo", "Veterinário", "Pescador", "Lenhador", "Artesão", "Caminhoneiro"]
         };
 
-        // Popular selects de tema
         const menus = ['new-room-style', 'casual-style'];
         menus.forEach(m => {
             const select = document.getElementById(m);
@@ -129,51 +134,45 @@
         function showLobby() { isOnline = true; document.getElementById('setup-choice').style.display='none'; document.getElementById('lobby').style.display='block'; }
         function showCasual() { isOnline = false; isMaster = true; document.getElementById('setup-choice').style.display='none'; document.getElementById('casual-setup').style.display='block'; }
 
-        // ONLINE LOGIC
         db.ref('rooms').on('value', snap => {
             const list = document.getElementById('room-list'); list.innerHTML = "";
-            snap.forEach(c => {
-                list.innerHTML += `<div class="room-item"><span>${c.key}</span> <button onclick="entrarSala('${c.key}')" style="width:80px; margin:0">ENTRAR</button></div>`;
-            });
+            snap.forEach(c => { list.innerHTML += `<div class="room-item"><span>${c.key}</span> <button onclick="entrarSala('${c.key}')" style="width:80px; margin:0; padding:5px; font-size:0.7rem">ENTRAR</button></div>`; });
         });
 
         function criarSala() {
             currentRoom = document.getElementById('new-room-name').value;
             currentStyle = document.getElementById('new-room-style').value;
-            if(!currentRoom) return;
+            if(!currentRoom) return alert("Dê um nome à sala!");
             isMaster = true;
             db.ref('rooms/'+currentRoom).set({ style: currentStyle, master: true });
             abrirFichas(currentStyle, 1);
         }
 
         function entrarSala(name) {
-            currentRoom = name;
-            isMaster = false;
-            db.ref('rooms/'+name+'/style').once('value', s => {
-                currentStyle = s.val();
-                abrirFichas(currentStyle, 1);
-            });
-        }
-
-        // SETUP FICHAS
-        function showFichas() {
-            document.getElementById('lobby').style.display='none';
-            document.getElementById('casual-setup').style.display='none';
-            document.getElementById('step-fichas').style.display='block';
+            currentRoom = name; isMaster = false;
+            db.ref('rooms/'+name+'/style').once('value', s => { currentStyle = s.val(); abrirFichas(currentStyle, 1); });
         }
 
         function abrirFichas(style, qtd) {
-            showFichas();
+            document.getElementById('lobby').style.display='none';
+            document.getElementById('casual-setup').style.display='none';
+            document.getElementById('step-fichas').style.display='block';
             const container = document.getElementById('inputs-container');
             container.innerHTML = "";
             const classes = classesData[style];
             for(let i=0; i<qtd; i++) {
                 let options = classes.map(c => `<option>${c}</option>`).join('');
                 container.innerHTML += `
-                    <div class="player-card-input">
-                        <input type="text" class="in-nome" placeholder="Nome do Personagem">
+                    <div class="ficha-input-box">
+                        <div class="full-width" style="color:var(--red); font-size:0.7rem; border-bottom:1px solid #333">PERSONAGEM ${i+1}</div>
+                        <input type="text" class="in-nome full-width" placeholder="Nome do Personagem">
                         <select class="in-classe">${options}</select>
-                        <input type="number" class="in-hp" value="100">
+                        <input type="text" class="in-altura" placeholder="Altura">
+                        <input type="text" class="in-peso" placeholder="Peso">
+                        <div class="full-width">
+                            <label>Vida (HP Inicial)</label>
+                            <input type="number" class="in-hp" value="100">
+                        </div>
                     </div>`;
             }
         }
@@ -185,23 +184,33 @@
         }
 
         function finalizarSetup() {
-            const nomes = document.querySelectorAll('.in-nome');
-            const cls = document.querySelectorAll('.in-classe');
-            const hps = document.querySelectorAll('.in-hp');
-            
-            myChar = nomes[0].value || "Player";
-
+            const boxes = document.querySelectorAll('.ficha-input-box');
             if(isOnline) {
+                const b = boxes[0]; myChar = b.querySelector('.in-nome').value || "Anônimo";
                 db.ref(`rooms/${currentRoom}/players/${myChar}`).set({
-                    nome: myChar, classe: cls[0].value, hp: parseInt(hps[0].value), max: parseInt(hps[0].value)
+                    nome: myChar, classe: b.querySelector('.in-classe').value, 
+                    altura: b.querySelector('.in-altura').value || "N/A",
+                    peso: b.querySelector('.in-peso').value || "N/A",
+                    hp: parseInt(b.querySelector('.in-hp').value), max: parseInt(b.querySelector('.in-hp').value)
                 });
+                document.getElementById('chat-section').style.display = 'block';
             } else {
                 localPlayers = [];
-                nomes.forEach((n, i) => localPlayers.push({nome: n.value, classe: cls[i].value, hp: parseInt(hps[i].value), max: parseInt(hps[i].value)}));
+                boxes.forEach(b => {
+                    localPlayers.push({
+                        nome: b.querySelector('.in-nome').value || "Herói",
+                        classe: b.querySelector('.in-classe').value,
+                        altura: b.querySelector('.in-altura').value || "N/A",
+                        peso: b.querySelector('.in-peso').value || "N/A",
+                        hp: parseInt(b.querySelector('.in-hp').value), max: parseInt(b.querySelector('.in-hp').value)
+                    });
+                });
+                myChar = "Mestre Local";
             }
-
             document.getElementById('step-fichas').style.display='none';
             document.getElementById('rpg-panel').style.display='grid';
+            
+            // Controle de mestre
             if(isMaster) {
                 document.querySelectorAll('.master-only').forEach(e => e.style.display = 'block');
                 document.getElementById('player-dice-msg').style.display = 'none';
@@ -211,7 +220,19 @@
 
         function iniciarPainel() {
             if(isOnline) {
-                db.ref(`rooms/${currentRoom}/players`).on('value', snap => renderPlayers(snap));
+                db.ref(`rooms/${currentRoom}/players`).on('value', snap => {
+                    const list = document.getElementById('final-hp-list'); list.innerHTML = "";
+                    snap.forEach(child => {
+                        const p = child.val(); const pct = (p.hp/p.max)*100;
+                        list.innerHTML += `
+                            <div style="border:1px solid #444; padding:15px; margin-bottom:15px; background:#000">
+                                <div style="display:flex; justify-content:space-between"><b>${p.nome}</b> <span>${p.hp}/${p.max} HP</span></div>
+                                <div style="font-size:0.7rem; color:#888; margin:5px 0">${p.classe} | ${p.altura} | ${p.peso}</div>
+                                <div class="hp-bar-bg"><div class="hp-bar-fill" style="width:${pct}%"></div></div>
+                                ${isMaster ? `<div style="display:flex; gap:5px"><button onclick="updateHPOnline('${p.nome}', -10)" style="flex:1; margin:0">-10 HP</button><button onclick="updateHPOnline('${p.nome}', 10)" style="flex:1; margin:0; background:#1b4332">+10 HP</button></div>` : ''}
+                            </div>`;
+                    });
+                });
                 db.ref(`rooms/${currentRoom}/chat`).on('value', snap => {
                     const box = document.getElementById('chat-box'); box.innerHTML = "";
                     snap.forEach(c => box.innerHTML += `<div><b>${c.val().user}:</b> ${c.val().text}</div>`);
@@ -223,28 +244,15 @@
             }
         }
 
-        function renderPlayers(snap) {
-            const list = document.getElementById('final-hp-list'); list.innerHTML = "";
-            snap.forEach(child => {
-                const p = child.val();
-                const pct = (p.hp/p.max)*100;
-                list.innerHTML += `
-                    <div style="border:1px solid #444; padding:10px; margin-bottom:10px">
-                        <b>${p.nome}</b> (${p.classe}) | ${p.hp}/${p.max}
-                        <div class="hp-bar-bg"><div class="hp-bar-fill" style="width:${pct}%"></div></div>
-                        ${isMaster ? `<button onclick="updateHPOnline('${p.nome}', -10)" style="width:48%; margin:0">-10</button> <button onclick="updateHPOnline('${p.nome}', 10)" style="width:48%; margin:0; background:#1b4332">+10</button>` : ''}
-                    </div>`;
-            });
-        }
-
         function renderPlayersLocal() {
             const list = document.getElementById('final-hp-list'); list.innerHTML = "";
             localPlayers.forEach((p, i) => {
                 const pct = (p.hp/p.max)*100;
-                list.innerHTML += `<div style="border:1px solid #444; padding:10px; margin-bottom:10px">
-                    <b>${p.nome}</b> | ${p.hp}/${p.max}
+                list.innerHTML += `<div style="border:1px solid #444; padding:15px; margin-bottom:15px; background:#000">
+                    <div style="display:flex; justify-content:space-between"><b>${p.nome}</b> <span>${p.hp}/${p.max} HP</span></div>
+                    <div style="font-size:0.7rem; color:#888; margin:5px 0">${p.classe} | ${p.altura} | ${p.peso}</div>
                     <div class="hp-bar-bg"><div class="hp-bar-fill" style="width:${pct}%"></div></div>
-                    <button onclick="updateHPLocal(${i}, -10)" style="width:48%; margin:0">-10</button> <button onclick="updateHPLocal(${i}, 10)" style="width:48%; margin:0; background:#1b4332">+10</button>
+                    <div style="display:flex; gap:5px"><button onclick="updateHPLocal(${i}, -10)" style="flex:1; margin:0">-10 HP</button><button onclick="updateHPLocal(${i}, 10)" style="flex:1; margin:0; background:#1b4332">+10 HP</button></div>
                 </div>`;
             });
         }
@@ -254,8 +262,7 @@
         
         function enviarMsg() {
             const t = document.getElementById('chat-input').value; if(!t) return;
-            if(isOnline) db.ref(`rooms/${currentRoom}/chat`).push({user: myChar, text: t});
-            else { document.getElementById('chat-box').innerHTML += `<div><b>${myChar}:</b> ${t}</div>`; }
+            db.ref(`rooms/${currentRoom}/chat`).push({user: myChar, text: t});
             document.getElementById('chat-input').value = "";
         }
 
@@ -266,7 +273,7 @@
             if(isOnline) db.ref(`rooms/${currentRoom}/chat`).push({user: "SISTEMA", text: `Mestre rolou D${d}: [${res}]`});
         }
 
-        function salvarNotas() { db.ref(`rooms/${currentRoom}/notes`).set(document.getElementById('master-notes').value); }
+        function salvarNotas() { if(isOnline) db.ref(`rooms/${currentRoom}/notes`).set(document.getElementById('master-notes').value); }
     </script>
 </body>
 </html>
