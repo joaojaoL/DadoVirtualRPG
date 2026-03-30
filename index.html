@@ -3,124 +3,198 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RPG Master - Painel Completo</title>
-    <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <title>Gerador de Dados Online - RPG Master</title>
+    <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Special+Elite&family=Oswald:wght@700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #0d0d0f;
-            --card: #1a1a20;
-            --accent: #bc13fe;
-            --gold: #ffb703;
-            --text: #ffffff;
-            --green: #38b000;
+            --primary-red: #d90429;
+            --bg-dark: #0b090a;
+            --card-bg: #161a1d;
+            --text-white: #f5f3f4;
         }
 
         body {
             font-family: 'Roboto', sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            margin: 0; padding: 20px;
+            background-color: var(--bg-dark);
+            color: var(--text-white);
+            margin: 0; padding: 0;
             display: flex; flex-direction: column; align-items: center;
         }
 
-        .setup-screen {
-            max-width: 500px; width: 100%;
-            background: var(--card);
-            padding: 30px; border-radius: 15px;
-            border: 2px solid var(--accent);
+        /* CABEÇALHO INSPIRADO NA IMAGEM */
+        .header-rpg {
+            background-color: var(--primary-red);
+            width: 100%;
+            padding: 20px 0;
             text-align: center;
-            box-shadow: 0 0 20px rgba(188, 19, 254, 0.3);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            margin-bottom: 30px;
         }
 
-        h1, h2, h3 { font-family: 'MedievalSharp'; color: var(--gold); }
+        .header-rpg h1 {
+            margin: 0; color: white;
+            font-size: 2.2rem;
+            font-family: 'Oswald', sans-serif;
+            text-transform: uppercase;
+        }
 
-        input, button, textarea {
-            padding: 12px; margin: 5px;
-            border-radius: 8px; border: none;
+        .setup-screen {
+            max-width: 500px; width: 90%;
+            background: var(--card-bg);
+            padding: 30px; border-radius: 10px;
+            border-top: 5px solid var(--primary-red);
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+        }
+
+        select, input, button, textarea {
+            padding: 12px; margin: 10px 5px;
+            border-radius: 5px; border: 1px solid #444;
             font-size: 1rem;
         }
 
-        input, textarea { background: #2a2a35; color: white; border: 1px solid #444; width: 85%; }
+        select, input, textarea { background: #0b090a; color: white; width: 85%; }
         
         button { 
-            background: var(--accent); color: white; 
+            background: var(--primary-red); color: white; 
             font-weight: bold; cursor: pointer; transition: 0.3s;
+            border: none; text-transform: uppercase;
         }
         
-        button:hover { transform: scale(1.05); filter: brightness(1.2); }
+        button:hover { background: #ef233c; transform: translateY(-2px); }
+        button:disabled { background: #444; cursor: not-allowed; }
 
-        /* ROLETA ESTILIZADA */
-        .wheel-wrap {
-            position: relative; width: 180px; height: 180px;
-            margin: 15px auto; border-radius: 50%;
-            border: 6px solid var(--gold);
+        /* AREA DO DADO CENTRAL */
+        .dice-main-area {
+            position: relative;
+            width: 200px; height: 200px;
+            margin: 10px auto;
             display: flex; align-items: center; justify-content: center;
-            background: radial-gradient(circle, #333, #1a1a20);
-            transition: transform 3s cubic-bezier(0.1, 0, 0.2, 1);
-        }
-
-        .wheel-wrap::after {
-            content: '▼'; position: absolute; top: -20px; 
-            color: var(--gold); font-size: 20px; left: 50%; transform: translateX(-50%);
-        }
-
-        /* PAINEL PRINCIPAL */
-        #rpg-panel {
-            display: none; width: 100%; max-width: 1100px;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;
-        }
-
-        .card { background: var(--card); padding: 20px; border-radius: 10px; border: 1px solid #333; text-align: center; }
-        
-        /* DADO */
-        .dice-container {
-            position: relative; width: 150px; height: 150px;
-            margin: 0 auto 15px; display: flex; align-items: center; justify-content: center;
         }
 
         #dice-image { width: 100%; height: 100%; object-fit: contain; }
 
         #dice-result {
-            position: absolute; top: 52%; left: 50%;
+            position: absolute;
+            top: 52%; left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 2rem; font-family: 'MedievalSharp';
-            color: #fff; text-shadow: 2px 2px 4px #000; pointer-events: none;
+            font-size: 2.8rem;
+            font-family: 'MedievalSharp', cursive;
+            color: white;
+            text-shadow: 2px 2px 8px rgba(0,0,0,1);
+            font-weight: bold;
         }
 
+        /* ROLETA */
+        .wheel-wrap {
+            position: relative; width: 160px; height: 160px;
+            margin: 15px auto; border-radius: 50%;
+            border: 5px solid var(--primary-red);
+            display: flex; align-items: center; justify-content: center;
+            background: #161a1d;
+            transition: transform 2.5s cubic-bezier(0.1, 0, 0.2, 1);
+        }
+        .wheel-wrap::after {
+            content: '▼'; position: absolute; top: -20px; color: var(--primary-red); font-size: 20px;
+        }
+
+        /* PAINEL DE JOGO */
+        #rpg-panel {
+            display: none; width: 95%; max-width: 1100px;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;
+            padding-bottom: 50px;
+        }
+
+        .card { background: var(--card-bg); padding: 20px; border-radius: 8px; text-align: center; border: 1px solid #333; }
+        
         .shake { animation: shake 0.4s ease-in-out; }
         @keyframes shake {
-            0% { transform: translate(2px, 1px); }
-            50% { transform: translate(-3px, 2px); }
-            100% { transform: translate(0,0); }
+            0%, 100% { transform: translate(0,0); }
+            25% { transform: translate(-5px, 5px) rotate(-5deg); }
+            75% { transform: translate(5px, -5px) rotate(5deg); }
         }
 
-        .order-item { color: #4cc9f0; font-weight: bold; padding: 8px; border-bottom: 1px solid #333; text-align: left;}
+        .order-item { background: #0b090a; margin: 8px 0; padding: 12px; border-left: 5px solid var(--primary-red); text-align: left; font-weight: bold;}
     </style>
 </head>
 <body>
 
-    <div id="setup-step-1" class="setup-screen">
-        <h1>⚔️ Preparar Mesa</h1>
-        <p>Quantos jogadores?</p>
-        <input type="number" id="player-count" min="1" value="3">
-        <button onclick="goToNames()">Próximo</button>
+    <div class="header-rpg">
+        <h1 id="main-title">Gerador de Dados Online</h1>
     </div>
 
-    <div id="setup-step-2" class="setup-screen" style="display:none;">
-        <h2>Nomes dos Heróis</h2>
+    <div id="setup-screen" class="setup-screen">
+        <h2>Configuração Inicial</h2>
+        <label>Tema do RPG:</label><br>
+        <select id="rpg-style">
+            <option value="medieval">Era Medieval ⚔️</option>
+            <option value="jujutsu">Jujutsu Kaisen ☯️</option>
+            <option value="terror">Terror Paranormal 👻</option>
+        </select>
+        <br><br>
+        <label>Número de Jogadores:</label><br>
+        <input type="number" id="player-count" min="1" value="3">
+        <br>
+        <button onclick="nextToNames()">Próximo: Nomes</button>
+    </div>
+
+    <div id="name-screen" class="setup-screen" style="display:none;">
+        <h2 id="theme-subtitle">Nomes dos Jogadores</h2>
         <div id="name-inputs"></div>
-        <button onclick="prepareWheel()" style="background: var(--green);">Confirmar Grupo</button>
+        <button id="confirm-names-btn" onclick="showInitWheel()">Confirmar Nomes</button>
         
-        <div id="roulette-area" style="display:none;">
-            <div class="wheel-wrap" id="init-wheel"><div id="winner-text" style="font-family: 'MedievalSharp';">?</div></div>
-            <p id="status-msg"></p>
-            <button id="spin-btn" onclick="spinPlayer()">Sortear Próxima Iniciativa</button>
+        <div id="init-area" style="display:none;">
+            <div class="wheel-wrap" id="init-wheel"><div id="init-winner" style="font-weight:bold; font-family:'MedievalSharp';">?</div></div>
+            <p id="init-status"></p>
+            <button id="spin-init-btn" onclick="spinInitiative()">Girar Ordem</button>
         </div>
     </div>
 
     <div id="rpg-panel">
-        
         <div class="card">
-            <h2>📜 Turnos</h2>
+            <h3>📜 Ordem de Iniciativa</h3>
             <div id="final-order-list"></div>
-            <button onclick="location.reload()" style="background:#444; margin-top: 20px; width: 80%; font-
+            <button onclick="location.reload()" style="background:#444; font-size: 0.7rem; margin-top:20px;">Reiniciar Mesa</button>
+        </div>
+
+        <div class="card">
+            <h3>🎲 Lançador de Dados</h3>
+            <label>Selecione o Dado:</label><br>
+            <select id="dice-selector">
+                <option value="4">D4 (Quatro lados)</option>
+                <option value="6">D6 (Cubo)</option>
+                <option value="10">D10 (Dez lados)</option>
+                <option value="12">D12 (Doze lados)</option>
+                <option value="20" selected>D20 (Vinte lados)</option>
+                <option value="100">D100 (Porcentagem)</option>
+            </select>
+            
+            <div class="dice-main-area" id="dice-container">
+                <img src="dado-20-lados.png" id="dice-image" alt="Dado">
+                <div id="dice-result">--</div>
+            </div>
+            
+            <button onclick="rollSelectedDice()" style="width: 80%; font-size: 1.2rem; padding: 15px;">Lançar</button>
+        </div>
+
+        <div class="card">
+            <h3>🎡 Eventos do Mestre</h3>
+            <div class="wheel-wrap" id="master-wheel">
+                <div id="master-res" style="font-family:'MedievalSharp'; font-size: 1rem;">?</div>
+            </div>
+            <textarea id="event-list" rows="3">Crítico!&#10;Falha!&#10;Inimigo Novo&#10;Achou Item</textarea>
+            <button onclick="spinMaster()" style="width: 100%;">Girar Evento</button>
+        </div>
+    </div>
+
+    <script>
+        let players = [];
+        let remaining = [];
+        let finalOrder = [];
+        let rotInit = 0, rotMaster = 0;
+
+        function nextToNames() {
+            const style = document.getElementById('rpg-style').value;
+            const count = parseInt(document.getElementById('player-count').value);
+            
+            if(isNaN(count) || count < 1) return alert("Ins
