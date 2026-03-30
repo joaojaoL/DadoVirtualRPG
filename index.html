@@ -107,7 +107,6 @@
         
         .notes-area { grid-column: 1 / -1; background: #000; border: 2px dashed var(--red); padding: 20px; margin-top: 25px; }
 
-        /* ESTILO DA CALCULADORA POPUP */
         #calc-popup {
             display: none;
             position: fixed;
@@ -176,6 +175,7 @@
         <div class="card">
             <h3>[STATUS DO GRUPO]</h3>
             <div id="final-hp-list"></div>
+            <button onclick="reiniciarTudo()" style="font-size: 0.8rem; padding: 10px; background: #333;">REINICIAR TUDO</button>
         </div>
 
         <div class="card">
@@ -197,7 +197,7 @@
             
             <div class="notes-area">
                 <label style="margin:0">NOTAS DA AVENTURA</label>
-                <textarea id="master-notes" rows="8" placeholder="Digite aqui o resumo da história..."></textarea>
+                <textarea id="master-notes" rows="8" placeholder="Digite aqui o resumo da história..." oninput="salvarProgresso()"></textarea>
             </div>
         </div>
     </div>
@@ -280,18 +280,21 @@
                     classe: card.querySelector('.in-classe').value,
                     hp: hpVal,
                     maxHp: hpVal,
-                    extra: card.querySelector('.in-extra').value || "Nenhum"
+                    extra: card.querySelector('.in-extra').value || "Nenhum",
+                    itens: ""
                 });
             });
             document.getElementById('step2').style.display = 'none';
             document.getElementById('rpg-panel').style.display = 'grid';
             carregarPainel();
+            salvarProgresso();
         }
 
         function carregarPainel() {
             const container = document.getElementById('final-hp-list');
             container.innerHTML = '';
             finalOrder.forEach((p, i) => {
+                const pct = (p.hp / p.maxHp) * 100;
                 container.innerHTML += `
                     <div style="border: 2px solid #444; padding: 15px; margin-bottom: 15px; background: #000">
                         <div style="display:flex; justify-content:space-between; margin-bottom:5px">
@@ -299,13 +302,14 @@
                             <span id="num-hp-${i}">${p.hp}/${p.maxHp}</span>
                         </div>
                         <div style="font-size:0.75rem; color:#aaa; margin-bottom:5px">${p.classe} | Info: ${p.extra}</div>
-                        <div class="hp-bar-bg"><div id="bar-fill-${i}" class="hp-bar-fill"></div></div>
+                        <div class="hp-bar-bg"><div id="bar-fill-${i}" class="hp-bar-fill" style="width:${pct}%"></div></div>
                         <div style="display:flex; gap:10px; margin-top:10px;">
                             <button onclick="mudarVida(${i}, -1)" style="flex:1; padding:8px; margin:0; font-size:0.9rem; background:#440000">-1 HP</button>
                             <button onclick="mudarVida(${i}, 1)" style="flex:1; padding:8px; margin:0; font-size:0.9rem; background:#1b4332">+1 HP</button>
                         </div>
-                        <textarea placeholder="Inventário e Itens..." style="margin-top:10px; height:70px; font-size:0.75rem; border-color:#333"></textarea>
+                        <textarea id="itens-${i}" placeholder="Inventário e Itens..." oninput="salvarItens(${i})" style="margin-top:10px; height:70px; font-size:0.75rem; border-color:#333">${p.itens || ''}</textarea>
                     </div>`;
+                mudarVida(i, 0); 
             });
         }
 
@@ -313,13 +317,19 @@
             let p = finalOrder[idx];
             p.hp = Math.max(0, Math.min(p.maxHp, p.hp + valor));
             const pct = (p.hp / p.maxHp) * 100;
-            document.getElementById(`bar-fill-${idx}`).style.width = pct + "%";
+            const fill = document.getElementById(`bar-fill-${idx}`);
+            fill.style.width = pct + "%";
             document.getElementById(`num-hp-${idx}`).innerText = `${p.hp}/${p.maxHp}`;
             
-            const fill = document.getElementById(`bar-fill-${idx}`);
             if(pct < 30) fill.style.background = "#d90429";
             else if(pct < 60) fill.style.background = "#ffb703";
             else fill.style.background = "#38b000";
+            salvarProgresso();
+        }
+
+        function salvarItens(idx) {
+            finalOrder[idx].itens = document.getElementById(`itens-${idx}`).value;
+            salvarProgresso();
         }
 
         function jogarDado() {
@@ -334,7 +344,6 @@
             }, 500);
         }
 
-        // FUNÇÕES DA CALCULADORA
         function toggleCalc() {
             const pop = document.getElementById('calc-popup');
             pop.style.display = (pop.style.display === 'block') ? 'none' : 'block';
@@ -348,6 +357,39 @@
                 document.getElementById('calc-display').value = 'Erro';
             }
         }
+
+        // --- SISTEMA DE SAVE ---
+        function salvarProgresso() {
+            const dadosSessao = {
+                finalOrder: finalOrder,
+                notas: document.getElementById('master-notes').value,
+                fase: document.getElementById('rpg-panel').style.display === 'grid' ? 'painel' : 'setup'
+            };
+            localStorage.setItem('rpg_save_data', JSON.stringify(dadosSessao));
+        }
+
+        function carregarProgresso() {
+            const salvo = localStorage.getItem('rpg_save_data');
+            if (salvo) {
+                const dados = JSON.parse(salvo);
+                if (dados.fase === 'painel') {
+                    finalOrder = dados.finalOrder;
+                    document.getElementById('step1').style.display = 'none';
+                    document.getElementById('rpg-panel').style.display = 'grid';
+                    document.getElementById('master-notes').value = dados.notas || '';
+                    carregarPainel();
+                }
+            }
+        }
+
+        function reiniciarTudo() {
+            if(confirm("Deseja apagar tudo e começar uma nova sessão?")) {
+                localStorage.removeItem('rpg_save_data');
+                location.reload();
+            }
+        }
+
+        window.onload = carregarProgresso;
     </script>
 </body>
 </html>
