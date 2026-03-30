@@ -94,10 +94,10 @@
             <option value="medieval">Medieval</option>
             <option value="slasher">Slasher</option>
             <option value="faroeste">Faroeste</option>
-            <option value= "jojo">Jojo</option>
-            <option value= "paranormal">Paranormal</option>
-            <option value= "one piece">One Piece</option>
-            <option value= "casa amaldiçoada">Casa Amaldiçoada</option>
+            <option value="jojo">Jojo</option>
+            <option value="paranormal">Paranormal</option>
+            <option value="one piece">One Piece</option>
+            <option value="casa amaldiçoada">Casa Amaldiçoada</option>
         </select>
 
         <label>ONE SHOT?</label>
@@ -107,8 +107,7 @@
         </select>
 
         <label>DURAÇÃO DA CAMPANHA</label>
-        <select id="duration">
-            </select>
+        <select id="duration"></select>
 
         <label>QUANTIDADE DE JOGADORES</label>
         <input type="number" id="p-count" value="2" min="1">
@@ -160,7 +159,11 @@
             medieval: ["Viking", "Arqueiro", "Mago", "Guerreiro", "Ladino", "Paladino", "Bárbaro", "Bardo", "Druida", "Monge", "Feiticeiro", "Necromante", "Alquimista"],
             jujutsu: ["Feiticeiro", "Usuário de Maldição", "Maldição", "Restrição Celestial", "Xamã", "Invocador", "Mestre de Barreiras", "Grau Especial", "Grau 1", "Grau 2", "Grau 3", "Grau 4", "Corpo Amaldiçoado"],
             slasher: ["Médico", "Militar", "Estudante", "Policial", "Sobrevivente", "Cozinheiro", "Mecânico", "Zelador", "Atleta", "Nerd", "Popular", "Cético", "Repórter"],
-            roça: ["Vaqueiro", "Peão", "Benzedeira", "Fazendeiro", "Mateiro", "Violeiro", "Capataz", "Agrônomo", "Veterinário", "Pescador", "Lenhador", "Artesão", "Caminhoneiro"]
+            faroeste: ["Pistoleiro", "Xerife", "Bandoleiro", "Caçador de Recompensas", "Garimpeiro", "Cartas na Manga", "Médico de Fronteira", "Cavalariano", "Batedor", "Dono de Saloon", "Fugitivo", "Indígena Guerreiro", "Pregador"],
+            jojo: ["Usuário Stand (Curto Alcance)", "Usuário Stand (Longo Alcance)", "Usuário Stand (Automático)", "Mestre Hamon", "Vampiro", "Homem do Pilar", "Ciborgue", "Usuário Stand (Fenômeno)", "Usuário Spin", "Usuário Stand (Colônia)", "Usuário Stand (Postura)", "Lutador", "Estrategista"],
+            "casa amaldiçoada": ["Médium", "Investigador Paranormal", "Cético", "Escritor de Horror", "Herdeiro", "Ocultista", "Exorcista", "Criança Sensitiva", "Historiador", "Zelador Sinistro", "Cientista", "Sobrevivente", "Fotógrafo"],
+            paranormal: ["Combatente", "Especialista", "Ocultista", "Infiltrado", "Atirador de Elite", "Graduado", "Flagelador", "Conduíte", "Lâmina Paranormal", "Médico de Campo", "Técnico", "Negociador", "Exorcista"],
+            "one piece": ["Capitão", "Espadachim", "Navegador", "Atirador", "Cozinheiro", "Médico", "Arqueólogo", "Carpinteiro", "Músico", "Timoneiro", "Cientista", "Artesão", "Contramestre"]
         };
 
         function proximoPasso() {
@@ -234,7 +237,6 @@
             document.getElementById(`bar-fill-${idx}`).style.width = pct + "%";
             document.getElementById(`num-hp-${idx}`).innerText = `${p.hp}/${p.maxHp}`;
             
-            // Cor dinâmica da barra
             const fill = document.getElementById(`bar-fill-${idx}`);
             if(pct < 30) fill.style.background = "#d90429";
             else if(pct < 60) fill.style.background = "#ffb703";
