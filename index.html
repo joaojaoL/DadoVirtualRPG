@@ -3,201 +3,248 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RPG Master - Setup de Iniciativa</title>
-    <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <title>RPG Master - Tactical Interface</title>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg: #0d0d0f;
-            --card: #1a1a20;
-            --accent: #bc13fe;
-            --gold: #ffb703;
-            --text: #ffffff;
+        :root { 
+            --red: #d90429; 
+            --dark: #0b090a; 
+            --card: #161a1d; 
+            --white: #f5f3f4; 
+            --border: #444;
+            --accent: #ef233c;
         }
 
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            margin: 0; padding: 20px;
-            display: flex; flex-direction: column; align-items: center;
+        body { 
+            font-family: 'Roboto Mono', monospace; 
+            background: var(--dark); 
+            color: var(--white); 
+            margin: 0; padding: 0; 
+            display: flex; flex-direction: column; align-items: center; 
         }
-
-        .setup-screen {
-            max-width: 500px; width: 100%;
-            background: var(--card);
-            padding: 30px; border-radius: 15px;
-            border: 2px solid var(--accent);
-            text-align: center;
-            box-shadow: 0 0 20px rgba(188, 19, 254, 0.3);
-        }
-
-        h1, h2 { font-family: 'MedievalSharp'; color: var(--gold); }
-
-        input, button {
-            padding: 12px; margin: 5px;
-            border-radius: 8px; border: none;
-            font-size: 1rem;
-        }
-
-        input { background: #2a2a35; color: white; border: 1px solid #444; width: 80%; }
         
+        .header { 
+            background: var(--red); 
+            width: 100%; padding: 25px 0; 
+            text-align: center; border-bottom: 5px solid #000;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+        .header h1 { margin: 0; font-family: 'Oswald'; text-transform: uppercase; letter-spacing: 2px; }
+
+        .container { 
+            max-width: 700px; width: 90%; 
+            background: var(--card); 
+            padding: 35px; 
+            border: 3px solid var(--red); 
+            margin: 40px 20px; 
+            box-shadow: 12px 12px 0px #000;
+        }
+
+        h2 { font-family: 'Oswald'; text-transform: uppercase; border-bottom: 2px solid var(--red); padding-bottom: 10px; margin-bottom: 20px; color: #fff; }
+        
+        label { display: block; margin-top: 15px; font-weight: bold; color: var(--red); text-align: left; font-size: 0.85rem; letter-spacing: 1px; }
+        
+        select, input, textarea { 
+            padding: 14px; margin: 8px 0; 
+            border: 2px solid var(--border); 
+            background: #000; color: #fff; 
+            width: 100%; box-sizing: border-box; 
+            border-radius: 0; outline: none;
+        }
+        select:focus, input:focus { border-color: var(--red); }
+
         button { 
-            background: var(--accent); color: white; 
-            font-weight: bold; cursor: pointer; transition: 0.3s;
+            background: var(--red); 
+            color: white; border: none; 
+            padding: 18px; width: 100%; 
+            font-family: 'Oswald'; font-size: 1.2rem; 
+            text-transform: uppercase; cursor: pointer; 
+            margin-top: 25px; display: block;
+            box-shadow: 4px 4px 0px #800000;
         }
+        button:hover { background: var(--accent); transform: translate(-2px, -2px); box-shadow: 6px 6px 0px #000; }
+
+        .player-card-input { 
+            border: 2px solid #555; 
+            background: #1e1e1e;
+            padding: 20px; margin-bottom: 25px; 
+            display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+        }
+
+        #rpg-panel { display: none; width: 98%; max-width: 1300px; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px; padding: 25px; }
+        .card { background: var(--card); padding: 25px; border: 2px solid var(--red); box-shadow: 8px 8px 0px #000; }
+
+        .hp-bar-bg { height: 30px; background: #222; border: 2px solid #000; position: relative; margin: 10px 0; }
+        .hp-bar-fill { height: 100%; background: var(--red); width: 100%; transition: 0.4s ease; }
+
+        .dice-box { width: 120px; height: 120px; border: 4px solid var(--red); background: #000; margin: 20px auto; display: flex; align-items: center; justify-content: center; font-size: 3rem; font-family: 'Oswald'; color: #fff; box-shadow: 5px 5px 0px #000; }
         
-        button:hover { transform: scale(1.05); filter: brightness(1.2); }
-        button:disabled { background: #444; cursor: not-allowed; }
-
-        /* ROLETA ESTILIZADA */
-        #wheel-box {
-            position: relative; width: 200px; height: 200px;
-            margin: 20px auto; border-radius: 50%;
-            border: 8px solid var(--gold);
-            display: flex; align-items: center; justify-content: center;
-            background: conic-gradient(from 0deg, #1a1a20, #333, #1a1a20);
-            transition: transform 2.5s cubic-bezier(0.1, 0, 0.2, 1);
-        }
-
-        #wheel-box::after {
-            content: '▼'; position: absolute; top: -25px; 
-            color: var(--gold); font-size: 25px;
-        }
-
-        /* PAINEL PRINCIPAL (ESCONDIDO NO INÍCIO) */
-        #rpg-panel {
-            display: none; width: 100%; max-width: 1000px;
-            grid-template-columns: 1fr 1fr; gap: 20px;
-        }
-
-        .card { background: var(--card); padding: 20px; border-radius: 10px; border: 1px solid #333; }
-        .order-item { color: #4cc9f0; font-weight: bold; padding: 5px; border-bottom: 1px solid #333; }
+        .notes-area { grid-column: 1 / -1; background: #000; border: 2px dashed var(--red); padding: 20px; margin-top: 25px; }
     </style>
 </head>
 <body>
 
-    <div id="setup-step-1" class="setup-screen">
-        <h1>⚔️ Iniciar Sessão</h1>
-        <p>Quantos heróis (ou vilões) participarão?</p>
-        <input type="number" id="player-count" min="1" placeholder="Ex: 4">
-        <button onclick="goToNames()">Próximo</button>
+    <div class="header"><h1>Painel do Mestre Online</h1></div>
+
+    <div id="step1" class="container">
+        <h2>Configuração de Sessão</h2>
+        <label>ESTILO DO RPG</label>
+        <select id="rpg-style">
+            <option value="jujutsu">Jujutsu Kaisen</option>
+            <option value="medieval">Medieval</option>
+            <option value="slasher">Slasher</option>
+            <option value="roça">Aventuras na Roça</option>
+        </select>
+
+        <label>ONE SHOT?</label>
+        <select id="one-shot">
+            <option value="Sim">Sim</option>
+            <option value="Não">Não</option>
+        </select>
+
+        <label>DURAÇÃO DA CAMPANHA</label>
+        <select id="duration">
+            </select>
+
+        <label>QUANTIDADE DE JOGADORES</label>
+        <input type="number" id="p-count" value="2" min="1">
+
+        <button onclick="proximoPasso()">Configurar Jogadores</button>
     </div>
 
-    <div id="setup-step-2" class="setup-screen" style="display:none;">
-        <h2>Quem são eles?</h2>
-        <div id="name-inputs"></div>
-        <button onclick="prepareWheel()" style="background: #38b000;">Confirmar Nomes</button>
-        
-        <div id="roulette-area" style="display:none;">
-            <hr style="margin: 20px 0; border: 0.5px solid #444;">
-            <div id="wheel-box"><div id="winner-text" style="font-family: 'MedievalSharp';">?</div></div>
-            <p id="status-msg">Sorteie a ordem de iniciativa!</p>
-            <button id="spin-btn" onclick="spinPlayer()">Girar para Ordem</button>
-        </div>
+    <div id="step2" class="container" style="display:none; max-width: 850px;">
+        <h2>Fichas dos Personagens</h2>
+        <div id="inputs-container"></div>
+        <button onclick="confirmarFichas()">Finalizar e Abrir Painel</button>
     </div>
 
     <div id="rpg-panel">
         <div class="card">
-            <h2>📜 Ordem do Turno</h2>
-            <div id="final-order-list"></div>
-            <button onclick="location.reload()" style="background:#444; margin-top: 20px; font-size: 0.7rem;">Nova Sessão</button>
+            <h3>[STATUS DO GRUPO]</h3>
+            <div id="final-hp-list"></div>
         </div>
 
         <div class="card">
-            <h2>🎲 Dados Arcanos</h2>
-            <div id="dice-result" style="font-size: 4rem; color: var(--gold); text-align: center;">--</div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                <button onclick="roll(4)">D4</button>
-                <button onclick="roll(6)">D6</button>
-                <button onclick="roll(10)">D10</button>
-                <button onclick="roll(20)">D20</button>
+            <h3>[DADOS E FERRAMENTAS]</h3>
+            <label>SELECIONAR DADO</label>
+            <select id="dado-seletor">
+                <option value="2">D2</option>
+                <option value="4">D4</option>
+                <option value="6">D6</option>
+                <option value="8">D8</option>
+                <option value="15">D15</option>
+                <option value="20" selected>D20</option>
+            </select>
+            <div id="dice-result" class="dice-box">--</div>
+            <button onclick="jogarDado()">Rolar Dado</button>
+            
+            <div class="notes-area">
+                <label style="margin:0">NOTAS DA AVENTURA</label>
+                <textarea id="master-notes" rows="8" placeholder="Digite aqui o resumo da história..."></textarea>
             </div>
         </div>
     </div>
 
     <script>
-        let playerList = [];
-        let remainingToSpin = [];
+        // Gerador de Duração Sem Pular Nada
+        const durationSelect = document.getElementById('duration');
+        for(let d=1; d<=30; d++) durationSelect.innerHTML += `<option value="${d} dias">${d} Dia(s)</option>`;
+        for(let m=1; m<=5; m++) durationSelect.innerHTML += `<option value="${m} meses">${m} Mês(es)</option>`;
+
         let finalOrder = [];
-        let rotation = 0;
+        const classesData = {
+            medieval: ["Viking", "Arqueiro", "Mago", "Guerreiro", "Ladino", "Paladino", "Bárbaro", "Bardo", "Druida", "Monge", "Feiticeiro", "Necromante", "Alquimista"],
+            jujutsu: ["Feiticeiro", "Usuário de Maldição", "Maldição", "Restrição Celestial", "Xamã", "Invocador", "Mestre de Barreiras", "Grau Especial", "Grau 1", "Grau 2", "Grau 3", "Grau 4", "Corpo Amaldiçoado"],
+            slasher: ["Médico", "Militar", "Estudante", "Policial", "Sobrevivente", "Cozinheiro", "Mecânico", "Zelador", "Atleta", "Nerd", "Popular", "Cético", "Repórter"],
+            roça: ["Vaqueiro", "Peão", "Benzedeira", "Fazendeiro", "Mateiro", "Violeiro", "Capataz", "Agrônomo", "Veterinário", "Pescador", "Lenhador", "Artesão", "Caminhoneiro"]
+        };
 
-        // Vai para a tela de nomes
-        function goToNames() {
-            const count = document.getElementById('player-count').value;
-            if(count < 1) return alert("Mestre, preciso de pelo menos 1 jogador!");
-            
-            const container = document.getElementById('name-inputs');
-            container.innerHTML = '';
-            for(let i=1; i<=count; i++) {
-                container.innerHTML += `<input type="text" placeholder="Nome do Jogador ${i}" class="p-name-input"><br>`;
+        function proximoPasso() {
+            const qtd = parseInt(document.getElementById('p-count').value);
+            const style = document.getElementById('rpg-style').value;
+            const area = document.getElementById('inputs-container');
+            area.innerHTML = '';
+            const classes = classesData[style] || classesData.medieval;
+
+            for(let i=0; i<qtd; i++) {
+                let options = classes.map(c => `<option value="${c}">${c}</option>`).join('');
+                area.innerHTML += `
+                    <div class="player-card-input">
+                        <div style="grid-column: span 2; color:var(--red); font-weight:bold; border-bottom: 1px solid #444; margin-bottom:5px">PLAYER ${i+1}</div>
+                        <input type="text" placeholder="Nome do Personagem" class="in-nome" style="grid-column: span 2">
+                        <select class="in-classe">${options}</select>
+                        <input type="number" placeholder="HP Inicial (Vida)" class="in-hp" value="100">
+                        <input type="text" placeholder="Idade" class="in-idade">
+                        <input type="text" placeholder="Altura" class="in-altura">
+                        <input type="text" placeholder="Peso" class="in-peso">
+                        <input type="text" placeholder="${style==='jujutsu'?'Energia Amaldiçoada':'Poder Especial'}" class="in-extra">
+                    </div>`;
             }
-            document.getElementById('setup-step-1').style.display = 'none';
-            document.getElementById('setup-step-2').style.display = 'block';
+            document.getElementById('step1').style.display = 'none';
+            document.getElementById('step2').style.display = 'block';
         }
 
-        // Prepara a roleta
-        function prepareWheel() {
-            const inputs = document.querySelectorAll('.p-name-input');
-            playerList = Array.from(inputs).map(i => i.value.trim() || "Herói Anônimo");
-            remainingToSpin = [...playerList];
-            
-            document.getElementById('name-inputs').style.display = 'none';
-            document.querySelector('#setup-step-2 button').style.display = 'none';
-            document.getElementById('roulette-area').style.display = 'block';
-            updateStatus();
-        }
-
-        // Gira a roleta e remove o jogador da vez
-        function spinPlayer() {
-            if(remainingToSpin.length === 0) return;
-
-            const btn = document.getElementById('spin-btn');
-            const wheel = document.getElementById('wheel-box');
-            const winnerDisplay = document.getElementById('winner-text');
-            
-            btn.disabled = true;
-            rotation += 1080 + Math.floor(Math.random() * 360);
-            wheel.style.transform = `rotate(${rotation}deg)`;
-            winnerDisplay.innerText = "???";
-
-            setTimeout(() => {
-                const randomIndex = Math.floor(Math.random() * remainingToSpin.length);
-                const winner = remainingToSpin.splice(randomIndex, 1)[0];
-                
-                finalOrder.push(winner);
-                winnerDisplay.innerText = winner;
-                
-                updateStatus();
-                btn.disabled = false;
-
-                // Se todos foram sorteados, abre o jogo!
-                if(remainingToSpin.length === 0) {
-                    btn.innerText = "ENTRAR NO JOGO";
-                    btn.onclick = enterGame;
-                    btn.style.background = "#38b000";
-                }
-            }, 2500);
-        }
-
-        function updateStatus() {
-            document.getElementById('status-msg').innerText = `Faltam sortear: ${remainingToSpin.length} jogadores`;
-        }
-
-        // Abre o painel principal
-        function enterGame() {
-            document.getElementById('setup-step-2').style.display = 'none';
+        function confirmarFichas() {
+            const cards = document.querySelectorAll('.player-card-input');
+            finalOrder = [];
+            cards.forEach((card) => {
+                let hpVal = parseInt(card.querySelector('.in-hp').value) || 100;
+                finalOrder.push({
+                    nome: card.querySelector('.in-nome').value || "Herói",
+                    classe: card.querySelector('.in-classe').value,
+                    hp: hpVal,
+                    maxHp: hpVal,
+                    extra: card.querySelector('.in-extra').value || "Nenhum"
+                });
+            });
+            document.getElementById('step2').style.display = 'none';
             document.getElementById('rpg-panel').style.display = 'grid';
-            
-            const listDiv = document.getElementById('final-order-list');
-            finalOrder.forEach((name, index) => {
-                listDiv.innerHTML += `<div class="order-item">${index + 1}º - ${name}</div>`;
+            carregarPainel();
+        }
+
+        function carregarPainel() {
+            const container = document.getElementById('final-hp-list');
+            container.innerHTML = '';
+            finalOrder.forEach((p, i) => {
+                container.innerHTML += `
+                    <div style="border: 2px solid #444; padding: 15px; margin-bottom: 15px; background: #000">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:5px">
+                            <span style="color:var(--red)"><b>${p.nome.toUpperCase()}</b></span>
+                            <span id="num-hp-${i}">${p.hp}/${p.maxHp}</span>
+                        </div>
+                        <div style="font-size:0.75rem; color:#aaa; margin-bottom:5px">${p.classe} | Info: ${p.extra}</div>
+                        <div class="hp-bar-bg"><div id="bar-fill-${i}" class="hp-bar-fill"></div></div>
+                        <div style="display:flex; gap:10px; margin-top:10px;">
+                            <button onclick="mudarVida(${i}, -10)" style="flex:1; padding:8px; margin:0; font-size:0.9rem; background:#440000">-10 HP</button>
+                            <button onclick="mudarVida(${i}, 10)" style="flex:1; padding:8px; margin:0; font-size:0.9rem; background:#1b4332">+10 HP</button>
+                        </div>
+                        <textarea placeholder="Inventário e Itens..." style="margin-top:10px; height:70px; font-size:0.75rem; border-color:#333"></textarea>
+                    </div>`;
             });
         }
 
-        // Dados
-        function roll(s) {
-            const res = Math.floor(Math.random() * s) + 1;
-            document.getElementById('dice-result').innerText = res;
+        function mudarVida(idx, valor) {
+            let p = finalOrder[idx];
+            p.hp = Math.max(0, Math.min(p.maxHp, p.hp + valor));
+            const pct = (p.hp / p.maxHp) * 100;
+            document.getElementById(`bar-fill-${idx}`).style.width = pct + "%";
+            document.getElementById(`num-hp-${idx}`).innerText = `${p.hp}/${p.maxHp}`;
+            
+            // Cor dinâmica da barra
+            const fill = document.getElementById(`bar-fill-${idx}`);
+            if(pct < 30) fill.style.background = "#d90429";
+            else if(pct < 60) fill.style.background = "#ffb703";
+            else fill.style.background = "#38b000";
+        }
+
+        function jogarDado() {
+            const lados = document.getElementById('dado-seletor').value;
+            const resDisplay = document.getElementById('dice-result');
+            resDisplay.innerText = "...";
+            setTimeout(() => {
+                const res = Math.floor(Math.random() * lados) + 1;
+                resDisplay.innerText = res;
+            }, 300);
         }
     </script>
 </body>
