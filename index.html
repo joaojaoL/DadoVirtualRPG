@@ -2,123 +2,245 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Roleta do Mestre e Calculadora</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>RPG Master - PC & Mobile</title>
+    <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Oswald:wght@700&display=swap" rel="stylesheet">
     <style>
-        /* --- Estilo da Roleta --- */
-        #container-roleta {
-            position: relative;
-            width: 300px;
-            margin: 50px auto;
-            text-align: center;
-        }
-        #canvas-roleta {
-            border-radius: 50%;
-            transition: transform 3s cubic-bezier(0.1, 0, 0.2, 1); /* 3 segundos de giro */
-        }
-        #btn-girar {
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            width: 60px; height: 60px;
-            background: white;
-            border-radius: 50%;
-            border: 4px solid #333;
-            cursor: pointer;
-            z-index: 10;
-            font-weight: bold;
-        }
+        :root { --red: #d90429; --dark: #0b090a; --card: #161a1d; --white: #f5f3f4; }
+        
+        /* REMOVE QUALQUER VIBRAÇÃO VISUAL OU SELEÇÃO NO CELULAR */
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }
 
-        /* --- Estilo da Calculadora (Pop-up) --- */
-        #calc-link { color: blue; cursor: pointer; text-decoration: underline; }
-        #modal-calc {
-            display: none; /* Escondido por padrão */
-            position: fixed;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            background: #f4f4f4;
-            padding: 20px;
-            border: 2px solid #333;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-            z-index: 100;
+        body { 
+            font-family: 'Segoe UI', Tahoma, sans-serif; 
+            background: var(--dark); color: var(--white); 
+            margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center;
+            overflow-x: hidden;
         }
-        #modal-calc .close-btn {
-            float: right;
-            cursor: pointer;
-            font-weight: bold;
-            color: red;
+        
+        .header { background: var(--red); width: 100%; padding: 20px 0; text-align: center; box-shadow: 0 4px 15px #000; z-index: 100; }
+        .header h1 { margin: 0; font-family: 'Oswald'; text-transform: uppercase; letter-spacing: 1px; }
+
+        .master-tools { display: flex; gap: 10px; margin-top: 10px; justify-content: center; }
+        .btn-tool { padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; border: none; text-transform: uppercase; font-size: 12px; }
+        .btn-calc { background: #00aaff; color: white; }
+        .btn-roulette { background: white; color: black; }
+
+        .container { 
+            width: 95%; max-width: 600px; background: var(--card); 
+            padding: 25px; border-radius: 12px; border-top: 6px solid var(--red); 
+            margin: 20px auto; box-shadow: 0 10px 30px #000; text-align: center; 
         }
+        
+        label { display: block; margin-top: 12px; font-weight: bold; color: var(--red); text-align: left; }
+        
+        select, input, button, textarea { 
+            padding: 14px; margin: 8px 0; border-radius: 8px; border: 1px solid #444; 
+            font-size: 1rem; background: #0b090a; color: white; width: 100%; 
+        }
+        
+        button { background: var(--red); border: none; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        button:active { transform: scale(0.98); } /* Feedback simples sem tremer */
+
+        .player-row { background: #252525; padding: 15px; border-radius: 8px; margin-bottom: 12px; border-left: 5px solid var(--red); display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+        #rpg-panel { display: none; width: 95%; max-width: 1100px; margin: 20px auto; gap: 20px; }
+        @media (min-width: 768px) { #rpg-panel { grid-template-columns: 1.5fr 1fr; } }
+        @media (max-width: 767px) { #rpg-panel { grid-template-columns: 1fr; } .player-row { grid-template-columns: 1fr; } }
+
+        .card { background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid #333; height: fit-content; }
+
+        /* DADO SEM ANIMAÇÃO DE TREMER */
+        .dice-area { position: relative; width: 180px; height: 180px; margin: 20px auto; }
+        .dice-img { width: 100%; height: 100%; object-fit: contain; }
+        .dice-val { position: absolute; top: 52%; left: 50%; transform: translate(-50%, -50%); font-size: 3rem; font-family: 'MedievalSharp'; color: white; text-shadow: 2px 2px 4px #000; }
+
+        .hp-unit { background: #111; padding: 12px; border-radius: 10px; margin-bottom: 15px; }
+        .hp-bar-bg { height: 18px; background: #333; border-radius: 3px; overflow: hidden; position: relative; }
+        .hp-bar-fill { height: 100%; background: #e63946; width: 100%; transition: 0.4s; }
+
+        /* MODAIS */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-content { background: #161a1d; padding: 20px; border-radius: 15px; border: 2px solid var(--red); position: relative; text-align: center; width: 90%; max-width: 400px; max-height: 95vh; overflow-y: auto; }
+        .close-modal { position: absolute; top: 5px; right: 15px; color: red; font-size: 30px; cursor: pointer; font-weight: bold; }
+
+        /* ROLETA */
+        #canvas-roleta { border-radius: 50%; border: 5px solid #444; transition: transform 3s cubic-bezier(0.1, 0, 0.2, 1); }
+        #btn-roleta-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; background: white; border-radius: 50%; border: 4px solid #333; cursor: pointer; font-weight: bold; color: black; z-index: 10; }
+        
+        /* CONFIG DA ROLETA */
+        #roulette-input { height: 80px; margin-top: 10px; background: #000; font-size: 14px; resize: none; }
+
+        /* CALCULADORA */
+        #calc-display { width: 100%; height: 50px; background: #000; color: #0f0; text-align: right; font-size: 24px; margin-bottom: 10px; padding: 10px; border: 1px solid #555; }
+        .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
+        .calc-grid button { padding: 15px; margin: 0; font-size: 18px; background: #333; }
     </style>
 </head>
 <body>
 
-    <p id="calc-link" onclick="toggleCalc(true)">Calculadora</p>
-
-    <div id="container-roleta">
-        <canvas id="canvas-roleta" width="300" height="300"></canvas>
-        <button id="btn-girar" onclick="girarRoleta()">GIRAR</button>
+    <div class="header">
+        <h1>Mestre Multiplataforma</h1>
+        <div class="master-tools">
+            <button class="btn-tool btn-calc" onclick="openModal('modal-calc')">Calculadora</button>
+            <button class="btn-tool btn-roulette" onclick="openModal('modal-roleta')">Roleta</button>
+        </div>
     </div>
 
-    <div id="modal-calc">
-        <span class="close-btn" onclick="toggleCalc(false)">X</span>
-        <h3>Calculadora</h3>
-        <input type="text" id="display" readonly style="width: 100%; margin-bottom: 10px; text-align: right;">
-        <br>
-        <button onclick="addNum('7')">7</button> <button onclick="addNum('8')">8</button> <button onclick="addNum('9')">9</button> <button onclick="addNum('/')">/</button><br>
-        <button onclick="addNum('4')">4</button> <button onclick="addNum('5')">5</button> <button onclick="addNum('6')">6</button> <button onclick="addNum('*')">*</button><br>
-        <button onclick="addNum('1')">1</button> <button onclick="addNum('2')">2</button> <button onclick="addNum('3')">3</button> <button onclick="addNum('-')">-</button><br>
-        <button onclick="addNum('0')">0</button> <button onclick="limpar()">C</button> <button onclick="calcular()">=</button> <button onclick="addNum('+')">+</button>
+    <div id="modal-roleta" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('modal-roleta')">X</span>
+            <h3 style="margin: 0 0 10px 0;">ROLETA EDITÁVEL</h3>
+            <div style="position: relative; width: 280px; height: 280px; margin: auto;">
+                <canvas id="canvas-roleta" width="300" height="300" style="width: 280px; height: 280px;"></canvas>
+                <button id="btn-roleta-center" onclick="spinRoulette()">GIRAR</button>
+            </div>
+            <label>Itens (um por linha):</label>
+            <textarea id="roulette-input" placeholder="Ex:&#10;Dano&#10;Cura&#10;Item">MORTE&#10;OURO&#10;SORTE&#10;DANO&#10;ERROU&#10;CURA</textarea>
+            <button onclick="updateRoulette()" style="background: #38b000; padding: 10px; font-size: 14px;">SALVAR NOMES</button>
+        </div>
+    </div>
+
+    <div id="modal-calc" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('modal-calc')">X</span>
+            <h3>Calculadora</h3>
+            <input type="text" id="calc-display" disabled>
+            <div class="calc-grid">
+                <button onclick="c_add('7')">7</button><button onclick="c_add('8')">8</button><button onclick="c_add('9')">9</button><button onclick="c_add('/')">/</button>
+                <button onclick="c_add('4')">4</button><button onclick="c_add('5')">5</button><button onclick="c_add('6')">6</button><button onclick="c_add('*')">*</button>
+                <button onclick="c_add('1')">1</button><button onclick="c_add('2')">2</button><button onclick="c_add('3')">3</button><button onclick="c_add('-')">-</button>
+                <button onclick="c_add('0')">0</button><button onclick="c_clear()">C</button><button onclick="c_solve()">=</button><button onclick="c_add('+')">+</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="step1" class="container">
+        <h2>Sessão</h2>
+        <label>Jogadores</label>
+        <input type="number" id="p-count" value="3">
+        <label>Vida Inicial</label>
+        <input type="number" id="p-hp-base" value="100">
+        <button onclick="proximo()">Configurar Grupo</button>
+    </div>
+
+    <div id="step2" class="container" style="display:none;">
+        <div id="inputs-area"></div>
+        <button onclick="confirmar()">Confirmar Heróis</button>
+        <div id="sorteio-area" style="display:none; margin-top:20px;">
+            <div id="res-sorteio" style="color: gold;">Aguardando Sorteio...</div>
+            <button id="btn-rodar" onclick="girar()">Sortear Ordem</button>
+        </div>
+    </div>
+
+    <div id="rpg-panel">
+        <div class="card">
+            <h3>👥 Grupo</h3>
+            <div id="painel-hp"></div>
+        </div>
+        <div class="card">
+            <h3>🎲 Dado</h3>
+            <div class="dice-area">
+                <img src="dado.png" class="dice-img">
+                <div id="dice-result" class="dice-val">--</div>
+            </div>
+            <button onclick="jogar()">LANÇAR DADO</button>
+        </div>
     </div>
 
     <script>
-        // --- Lógica da Roleta ---
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+        // CALCULADORA
+        const display = document.getElementById('calc-display');
+        function c_add(v) { display.value += v; }
+        function c_clear() { display.value = ''; }
+        function c_solve() { try { display.value = eval(display.value); } catch { display.value = 'Erro'; } }
+
+        // ROLETA EDITÁVEL
         const canvas = document.getElementById('canvas-roleta');
         const ctx = canvas.getContext('2d');
-        // O "Mestre" pode alterar este Array com o que quiser
-        const opcoes = ["Opção A", "Opção B", "Opção C", "Opção D", "Opção E", "Opção F"];
-        const cores = ["#ff4545", "#ff8c00", "#ffd700", "#4caf50", "#1e90ff", "#8a2be2"];
+        let opcoes = [];
+        const cores = ["#d90429", "#ffcc00", "#38b000", "#3498db", "#9b59b6", "#e67e22"];
 
-        function desenharRoleta() {
-            const sliceAngle = (2 * Math.PI) / opcoes.length;
-            opcoes.forEach((texto, i) => {
+        function updateRoulette() {
+            const text = document.getElementById('roulette-input').value;
+            opcoes = text.split('\n').filter(t => t.trim() !== "");
+            drawRoulette();
+        }
+
+        function drawRoulette() {
+            const angle = (Math.PI * 2) / opcoes.length;
+            ctx.clearRect(0,0,300,300);
+            opcoes.forEach((txt, i) => {
                 ctx.beginPath();
                 ctx.fillStyle = cores[i % cores.length];
                 ctx.moveTo(150, 150);
-                ctx.arc(150, 150, 150, i * sliceAngle, (i + 1) * sliceAngle);
+                ctx.arc(150, 150, 150, i * angle, (i + 1) * angle);
                 ctx.fill();
-                // Texto
                 ctx.save();
                 ctx.translate(150, 150);
-                ctx.rotate(i * sliceAngle + sliceAngle / 2);
+                ctx.rotate(i * angle + angle / 2);
                 ctx.fillStyle = "white";
                 ctx.font = "bold 14px Arial";
-                ctx.fillText(texto, 60, 5);
+                ctx.fillText(txt.substring(0, 8), 60, 5);
                 ctx.restore();
             });
         }
-
-        let grausAtuais = 0;
-        function girarRoleta() {
-            const extraGiro = Math.floor(Math.random() * 360) + 1440; // No mínimo 4 voltas + aleatório
-            grausAtuais += extraGiro;
-            canvas.style.transform = `rotate(${grausAtuais}deg)`;
+        let rAngle = 0;
+        function spinRoulette() {
+            rAngle += Math.floor(Math.random() * 360) + 1800;
+            canvas.style.transform = `rotate(${rAngle}deg)`;
         }
 
-        // --- Lógica da Calculadora ---
-        function toggleCalc(show) {
-            document.getElementById('modal-calc').style.display = show ? 'block' : 'none';
+        // DADO (SEM VIBRAÇÃO)
+        function jogar() {
+            document.getElementById('dice-result').innerText = Math.floor(Math.random()*20)+1;
         }
 
-        function addNum(val) { document.getElementById('display').value += val; }
-        function limpar() { document.getElementById('display').value = ''; }
-        function calcular() {
-            try {
-                document.getElementById('display').value = eval(document.getElementById('display').value);
-            } catch {
-                alert("Conta inválida");
+        // LOGICA DO SEU SITE
+        let pList = []; let draft = []; let order = []; let base = 100;
+        function proximo() {
+            const n = parseInt(document.getElementById('p-count').value);
+            base = parseInt(document.getElementById('p-hp-base').value) || 100;
+            const area = document.getElementById('inputs-area');
+            area.innerHTML = '';
+            for(let i=0; i<n; i++) { area.innerHTML += `<input type="text" placeholder="Nome" class="in-n">`; }
+            document.getElementById('step1').style.display = 'none';
+            document.getElementById('step2').style.display = 'block';
+        }
+        function confirmar() {
+            const nomes = document.querySelectorAll('.in-n');
+            nomes.forEach((n, i) => pList.push({ nome: n.value || `P${i+1}`, hp: base }));
+            draft = [...pList];
+            document.getElementById('sorteio-area').style.display = 'block';
+        }
+        function girar() {
+            if(draft.length === 0) {
+                document.getElementById('step2').style.display = 'none';
+                document.getElementById('rpg-panel').style.display = 'grid';
+                render();
+                return;
             }
+            const p = draft.splice(Math.floor(Math.random()*draft.length), 1)[0];
+            order.push(p);
+            document.getElementById('res-sorteio').innerText = "Sorteado: " + p.nome;
+            if(draft.length === 0) document.getElementById('btn-rodar').innerText = "ENTRAR NO JOGO";
+        }
+        function render() {
+            const area = document.getElementById('painel-hp');
+            area.innerHTML = '';
+            order.forEach((p, i) => {
+                area.innerHTML += `<div class="hp-unit"><span>${p.nome}</span><div class="hp-bar-bg"><div id="bar-${i}" class="hp-bar-fill"></div></div><button onclick="u(${i},-10)">-10</button></div>`;
+            });
+        }
+        function u(i, v) {
+            order[i].hp = Math.max(0, Math.min(base, order[i].hp + v));
+            document.getElementById(`bar-${i}`).style.width = (order[i].hp / base * 100) + "%";
         }
 
-        desenharRoleta();
+        updateRoulette();
     </script>
 </body>
 </html>
