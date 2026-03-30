@@ -3,133 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RPG Master - PC & Mobile</title>
+    <title>RPG Master - Ultra Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Oswald:wght@700&display=swap" rel="stylesheet">
     <style>
         :root { --red: #d90429; --dark: #0b090a; --card: #161a1d; --white: #f5f3f4; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--dark); color: var(--white); margin: 0; padding-bottom: 50px; }
         
-        /* REMOVE QUALQUER VIBRAÇÃO VISUAL OU SELEÇÃO NO CELULAR */
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }
+        .header { background: var(--red); width: 100%; padding: 15px; text-align: center; box-shadow: 0 4px 15px #000; position: sticky; top:0; z-index:100; }
+        .header h1 { margin: 0; font-family: 'Oswald'; text-transform: uppercase; font-size: 1.2rem; }
 
-        body { 
-            font-family: 'Segoe UI', Tahoma, sans-serif; 
-            background: var(--dark); color: var(--white); 
-            margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center;
-            overflow-x: hidden;
-        }
+        .container { width: 92%; max-width: 600px; background: var(--card); padding: 20px; border-radius: 12px; border-top: 5px solid var(--red); margin: 15px auto; box-shadow: 0 10px 30px #000; text-align: center; }
         
-        .header { background: var(--red); width: 100%; padding: 20px 0; text-align: center; box-shadow: 0 4px 15px #000; z-index: 100; }
-        .header h1 { margin: 0; font-family: 'Oswald'; text-transform: uppercase; letter-spacing: 1px; }
-
-        .master-tools { display: flex; gap: 10px; margin-top: 10px; justify-content: center; }
-        .btn-tool { padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; border: none; text-transform: uppercase; font-size: 12px; }
-        .btn-calc { background: #00aaff; color: white; }
-        .btn-roulette { background: white; color: black; }
-
-        .container { 
-            width: 95%; max-width: 600px; background: var(--card); 
-            padding: 25px; border-radius: 12px; border-top: 6px solid var(--red); 
-            margin: 20px auto; box-shadow: 0 10px 30px #000; text-align: center; 
-        }
-        
-        label { display: block; margin-top: 12px; font-weight: bold; color: var(--red); text-align: left; }
-        
-        select, input, button, textarea { 
-            padding: 14px; margin: 8px 0; border-radius: 8px; border: 1px solid #444; 
-            font-size: 1rem; background: #0b090a; color: white; width: 100%; 
-        }
-        
+        input, select, button { padding: 15px; margin: 8px 0; border-radius: 8px; border: 1px solid #444; font-size: 1rem; background: #0b090a; color: white; width: 100%; }
         button { background: var(--red); border: none; font-weight: bold; cursor: pointer; text-transform: uppercase; }
-        button:active { transform: scale(0.98); } /* Feedback simples sem tremer */
+        button:active { transform: scale(0.95); background: #ef233c; }
 
-        .player-row { background: #252525; padding: 15px; border-radius: 8px; margin-bottom: 12px; border-left: 5px solid var(--red); display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        /* GRID DO PAINEL */
+        #rpg-panel { display: none; width: 95%; max-width: 1100px; margin: 0 auto; gap: 15px; flex-direction: column; }
+        @media (min-width: 800px) { #rpg-panel { display: none; flex-direction: row; align-items: flex-start; } }
 
-        #rpg-panel { display: none; width: 95%; max-width: 1100px; margin: 20px auto; gap: 20px; }
-        @media (min-width: 768px) { #rpg-panel { grid-template-columns: 1.5fr 1fr; } }
-        @media (max-width: 767px) { #rpg-panel { grid-template-columns: 1fr; } .player-row { grid-template-columns: 1fr; } }
+        .card { background: var(--card); padding: 15px; border-radius: 10px; border: 1px solid #333; flex: 1; }
 
-        .card { background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid #333; height: fit-content; }
+        /* BARRINHA PIXEL */
+        .hp-unit { background: #111; padding: 10px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #222; }
+        .hp-bar-wrapper { display: flex; align-items: center; gap: 8px; margin: 5px 0; }
+        .hp-heart { width: 22px; height: 22px; image-rendering: pixelated; }
+        .hp-bar-bg { flex-grow: 1; height: 16px; background: #444; border-radius: 2px; overflow: hidden; border: 1px solid #000; }
+        .hp-bar-fill { height: 100%; background: #e63946; width: 100%; transition: 0.3s; }
 
-        /* DADO SEM ANIMAÇÃO DE TREMER */
-        .dice-area { position: relative; width: 180px; height: 180px; margin: 20px auto; }
+        /* DADO */
+        .dice-area { position: relative; width: 140px; height: 140px; margin: 10px auto; }
         .dice-img { width: 100%; height: 100%; object-fit: contain; }
-        .dice-val { position: absolute; top: 52%; left: 50%; transform: translate(-50%, -50%); font-size: 3rem; font-family: 'MedievalSharp'; color: white; text-shadow: 2px 2px 4px #000; }
-
-        .hp-unit { background: #111; padding: 12px; border-radius: 10px; margin-bottom: 15px; }
-        .hp-bar-bg { height: 18px; background: #333; border-radius: 3px; overflow: hidden; position: relative; }
-        .hp-bar-fill { height: 100%; background: #e63946; width: 100%; transition: 0.4s; }
-
-        /* MODAIS */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center; }
-        .modal-content { background: #161a1d; padding: 20px; border-radius: 15px; border: 2px solid var(--red); position: relative; text-align: center; width: 90%; max-width: 400px; max-height: 95vh; overflow-y: auto; }
-        .close-modal { position: absolute; top: 5px; right: 15px; color: red; font-size: 30px; cursor: pointer; font-weight: bold; }
+        .dice-val { position: absolute; top: 52%; left: 50%; transform: translate(-50%, -50%); font-size: 2.5rem; font-family: 'MedievalSharp'; font-weight: bold; text-shadow: 2px 2px 4px #000; }
 
         /* ROLETA */
-        #canvas-roleta { border-radius: 50%; border: 5px solid #444; transition: transform 3s cubic-bezier(0.1, 0, 0.2, 1); }
-        #btn-roleta-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; background: white; border-radius: 50%; border: 4px solid #333; cursor: pointer; font-weight: bold; color: black; z-index: 10; }
+        .roulette-box { background: #000; padding: 20px; border-radius: 50%; width: 200px; height: 200px; margin: 20px auto; border: 4px solid var(--red); display: flex; align-items: center; justify-content: center; position: relative; transition: 3s cubic-bezier(0.1, 0, 0.1, 1); }
+        .roulette-arrow { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 25px solid gold; z-index: 10; }
         
-        /* CONFIG DA ROLETA */
-        #roulette-input { height: 80px; margin-top: 10px; background: #000; font-size: 14px; resize: none; }
+        #log { background: #050505; color: #0f0; font-family: 'Courier New', monospace; padding: 10px; height: 100px; overflow-y: auto; text-align: left; font-size: 0.8rem; border: 1px solid #333; margin-top: 10px; }
 
-        /* CALCULADORA */
-        #calc-display { width: 100%; height: 50px; background: #000; color: #0f0; text-align: right; font-size: 24px; margin-bottom: 10px; padding: 10px; border: 1px solid #555; }
-        .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
-        .calc-grid button { padding: 15px; margin: 0; font-size: 18px; background: #333; }
+        .shake { animation: shake 0.4s; }
+        @keyframes shake { 0%,100% {transform:rotate(0);} 25% {transform:rotate(5deg);} 75% {transform:rotate(-5deg);} }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1>Mestre Multiplataforma</h1>
-        <div class="master-tools">
-            <button class="btn-tool btn-calc" onclick="openModal('modal-calc')">Calculadora</button>
-            <button class="btn-tool btn-roulette" onclick="openModal('modal-roleta')">Roleta</button>
-        </div>
-    </div>
-
-    <div id="modal-roleta" class="modal">
-        <div class="modal-content">
-            <span class="close-modal" onclick="closeModal('modal-roleta')">X</span>
-            <h3 style="margin: 0 0 10px 0;">ROLETA EDITÁVEL</h3>
-            <div style="position: relative; width: 280px; height: 280px; margin: auto;">
-                <canvas id="canvas-roleta" width="300" height="300" style="width: 280px; height: 280px;"></canvas>
-                <button id="btn-roleta-center" onclick="spinRoulette()">GIRAR</button>
-            </div>
-            <label>Itens (um por linha):</label>
-            <textarea id="roulette-input" placeholder="Ex:&#10;Dano&#10;Cura&#10;Item">MORTE&#10;OURO&#10;SORTE&#10;DANO&#10;ERROU&#10;CURA</textarea>
-            <button onclick="updateRoulette()" style="background: #38b000; padding: 10px; font-size: 14px;">SALVAR NOMES</button>
-        </div>
-    </div>
-
-    <div id="modal-calc" class="modal">
-        <div class="modal-content">
-            <span class="close-modal" onclick="closeModal('modal-calc')">X</span>
-            <h3>Calculadora</h3>
-            <input type="text" id="calc-display" disabled>
-            <div class="calc-grid">
-                <button onclick="c_add('7')">7</button><button onclick="c_add('8')">8</button><button onclick="c_add('9')">9</button><button onclick="c_add('/')">/</button>
-                <button onclick="c_add('4')">4</button><button onclick="c_add('5')">5</button><button onclick="c_add('6')">6</button><button onclick="c_add('*')">*</button>
-                <button onclick="c_add('1')">1</button><button onclick="c_add('2')">2</button><button onclick="c_add('3')">3</button><button onclick="c_add('-')">-</button>
-                <button onclick="c_add('0')">0</button><button onclick="c_clear()">C</button><button onclick="c_solve()">=</button><button onclick="c_add('+')">+</button>
-            </div>
-        </div>
-    </div>
+    <div class="header"><h1>RPG Master Mobile + Roleta</h1></div>
 
     <div id="step1" class="container">
-        <h2>Sessão</h2>
+        <label>Estilo</label>
+        <select id="style"><option value="jujutsu">Jujutsu Kaisen</option><option value="medieval">Medieval</option></select>
         <label>Jogadores</label>
-        <input type="number" id="p-count" value="3">
-        <label>Vida Inicial</label>
-        <input type="number" id="p-hp-base" value="100">
+        <input type="number" id="p-count" value="3" inputmode="numeric">
+        <label>HP Inicial</label>
+        <input type="number" id="p-hp" value="100" inputmode="numeric">
         <button onclick="proximo()">Configurar Grupo</button>
     </div>
 
     <div id="step2" class="container" style="display:none;">
-        <div id="inputs-area"></div>
-        <button onclick="confirmar()">Confirmar Heróis</button>
-        <div id="sorteio-area" style="display:none; margin-top:20px;">
-            <div id="res-sorteio" style="color: gold;">Aguardando Sorteio...</div>
-            <button id="btn-rodar" onclick="girar()">Sortear Ordem</button>
+        <div id="inputs"></div>
+        <button onclick="confirmar()">Confirmar Tudo</button>
+        <div id="sorteio-area" style="display:none; margin-top:15px; border-top:1px solid #444; padding-top:15px;">
+            <div id="res-sorteio" style="color:gold;">Aguardando...</div>
+            <button id="btn-rodar" onclick="girarIniciativa()">Sortear Iniciativa</button>
         </div>
     </div>
 
@@ -137,110 +74,127 @@
         <div class="card">
             <h3>👥 Grupo</h3>
             <div id="painel-hp"></div>
+            <div id="log">Sessão iniciada...</div>
         </div>
+
         <div class="card">
-            <h3>🎲 Dado</h3>
-            <div class="dice-area">
+            <h3>🎲 Dados & Destino</h3>
+            <div class="dice-area" id="dice-anchor">
                 <img src="dado.png" class="dice-img">
                 <div id="dice-result" class="dice-val">--</div>
             </div>
-            <button onclick="jogar()">LANÇAR DADO</button>
+            <button onclick="jogarDado()">Lançar D20</button>
+            
+            <hr style="border:0; border-top:1px solid #333; margin:20px 0;">
+            
+            <h3>🎡 Roleta de Alvos</h3>
+            <div style="position:relative;">
+                <div class="roulette-arrow"></div>
+                <div id="roulette" class="roulette-box">
+                    <span id="target-name" style="font-weight:bold; color:gold; text-align:center;">?</span>
+                </div>
+            </div>
+            <button onclick="girarRoleta()" style="background:gold; color:black;">Girar Roleta</button>
         </div>
     </div>
 
     <script>
-        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        let pList = []; let draft = []; let order = []; let max = 100;
 
-        // CALCULADORA
-        const display = document.getElementById('calc-display');
-        function c_add(v) { display.value += v; }
-        function c_clear() { display.value = ''; }
-        function c_solve() { try { display.value = eval(display.value); } catch { display.value = 'Erro'; } }
-
-        // ROLETA EDITÁVEL
-        const canvas = document.getElementById('canvas-roleta');
-        const ctx = canvas.getContext('2d');
-        let opcoes = [];
-        const cores = ["#d90429", "#ffcc00", "#38b000", "#3498db", "#9b59b6", "#e67e22"];
-
-        function updateRoulette() {
-            const text = document.getElementById('roulette-input').value;
-            opcoes = text.split('\n').filter(t => t.trim() !== "");
-            drawRoulette();
+        function log(msg) {
+            const l = document.getElementById('log');
+            l.innerHTML += `> ${msg}<br>`;
+            l.scrollTop = l.scrollHeight;
         }
 
-        function drawRoulette() {
-            const angle = (Math.PI * 2) / opcoes.length;
-            ctx.clearRect(0,0,300,300);
-            opcoes.forEach((txt, i) => {
-                ctx.beginPath();
-                ctx.fillStyle = cores[i % cores.length];
-                ctx.moveTo(150, 150);
-                ctx.arc(150, 150, 150, i * angle, (i + 1) * angle);
-                ctx.fill();
-                ctx.save();
-                ctx.translate(150, 150);
-                ctx.rotate(i * angle + angle / 2);
-                ctx.fillStyle = "white";
-                ctx.font = "bold 14px Arial";
-                ctx.fillText(txt.substring(0, 8), 60, 5);
-                ctx.restore();
-            });
-        }
-        let rAngle = 0;
-        function spinRoulette() {
-            rAngle += Math.floor(Math.random() * 360) + 1800;
-            canvas.style.transform = `rotate(${rAngle}deg)`;
-        }
-
-        // DADO (SEM VIBRAÇÃO)
-        function jogar() {
-            document.getElementById('dice-result').innerText = Math.floor(Math.random()*20)+1;
-        }
-
-        // LOGICA DO SEU SITE
-        let pList = []; let draft = []; let order = []; let base = 100;
         function proximo() {
             const n = parseInt(document.getElementById('p-count').value);
-            base = parseInt(document.getElementById('p-hp-base').value) || 100;
-            const area = document.getElementById('inputs-area');
-            area.innerHTML = '';
-            for(let i=0; i<n; i++) { area.innerHTML += `<input type="text" placeholder="Nome" class="in-n">`; }
+            max = parseInt(document.getElementById('p-hp').value) || 100;
+            const area = document.getElementById('inputs');
+            area.innerHTML = '<h2>Personagens</h2>';
+            for(let i=0; i<n; i++) {
+                area.innerHTML += `<input type="text" placeholder="Nome do Jogador ${i+1}" class="in-n">`;
+            }
             document.getElementById('step1').style.display = 'none';
             document.getElementById('step2').style.display = 'block';
         }
+
         function confirmar() {
             const nomes = document.querySelectorAll('.in-n');
-            nomes.forEach((n, i) => pList.push({ nome: n.value || `P${i+1}`, hp: base }));
+            nomes.forEach((n, i) => pList.push({ nome: n.value || `Player ${i+1}`, hp: max }));
             draft = [...pList];
             document.getElementById('sorteio-area').style.display = 'block';
         }
-        function girar() {
-            if(draft.length === 0) {
-                document.getElementById('step2').style.display = 'none';
-                document.getElementById('rpg-panel').style.display = 'grid';
-                render();
-                return;
-            }
+
+        function girarIniciativa() {
+            if(draft.length === 0) return;
             const p = draft.splice(Math.floor(Math.random()*draft.length), 1)[0];
             order.push(p);
             document.getElementById('res-sorteio').innerText = "Sorteado: " + p.nome;
-            if(draft.length === 0) document.getElementById('btn-rodar').innerText = "ENTRAR NO JOGO";
+            if(draft.length === 0) {
+                const b = document.getElementById('btn-rodar');
+                b.innerText = "Entrar no Painel"; b.style.background = "green";
+                b.onclick = () => {
+                    document.getElementById('step2').style.display = 'none';
+                    document.getElementById('rpg-panel').style.display = 'flex';
+                    render();
+                };
+            }
         }
+
         function render() {
             const area = document.getElementById('painel-hp');
             area.innerHTML = '';
             order.forEach((p, i) => {
-                area.innerHTML += `<div class="hp-unit"><span>${p.nome}</span><div class="hp-bar-bg"><div id="bar-${i}" class="hp-bar-fill"></div></div><button onclick="u(${i},-10)">-10</button></div>`;
+                area.innerHTML += `<div class="hp-unit">
+                    <div style="display:flex; justify-content:space-between; font-family:'MedievalSharp';">
+                        <span>${p.nome}</span> <span id="txt-${i}">${p.hp}/${max}</span>
+                    </div>
+                    <div class="hp-bar-wrapper">
+                        <img src="as.jpg" class="hp-heart">
+                        <div class="hp-bar-bg"><div id="bar-${i}" class="hp-bar-fill"></div></div>
+                    </div>
+                    <div style="display:flex; gap:10px;">
+                        <button onclick="m(${i},-10)" style="flex:1; background:#660708; padding:8px;">-10</button>
+                        <button onclick="m(${i},10)" style="flex:1; background:#38b000; padding:8px;">+10</button>
+                    </div>
+                </div>`;
             });
         }
-        function u(i, v) {
-            order[i].hp = Math.max(0, Math.min(base, order[i].hp + v));
-            document.getElementById(`bar-${i}`).style.width = (order[i].hp / base * 100) + "%";
+
+        function m(i, v) {
+            const antigo = order[i].hp;
+            order[i].hp = Math.max(0, Math.min(max, order[i].hp + v));
+            document.getElementById(`bar-${i}`).style.width = (order[i].hp / max * 100) + "%";
+            document.getElementById(`txt-${i}`).innerText = `${order[i].hp}/${max}`;
+            log(`${order[i].nome} ${v > 0 ? 'curou' : 'perdeu'} ${Math.abs(v)} HP`);
         }
 
-        updateRoulette();
+        function jogarDado() {
+            const d = document.getElementById('dice-anchor');
+            d.classList.add('shake');
+            if(navigator.vibrate) navigator.vibrate(50); // Vibração mobile
+            setTimeout(() => {
+                const res = Math.floor(Math.random()*20)+1;
+                document.getElementById('dice-result').innerText = res;
+                d.classList.remove('shake');
+                log(`Dado rolado: ${res}`);
+            }, 400);
+        }
+
+        function girarRoleta() {
+            const wheel = document.getElementById('roulette');
+            const targetName = document.getElementById('target-name');
+            const sorteado = order[Math.floor(Math.random()*order.length)];
+            
+            wheel.style.transform = `rotate(${360 * 5 + Math.random()*360}deg)`;
+            targetName.innerText = "???";
+            
+            setTimeout(() => {
+                targetName.innerText = sorteado.nome;
+                log(`Roleta parou em: ${sorteado.nome}`);
+            }, 3000);
+        }
     </script>
 </body>
 </html>
