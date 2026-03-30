@@ -3,90 +3,113 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RPG MASTER - CLASSIC TACTICAL</title>
+    <title>RPG TACTICAL SYSTEM v3.0</title>
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <style>
-        :root { --red: #d90429; --dark: #0b090a; --card: #161a1d; --white: #f5f3f4; }
+        :root { --red: #ff002b; --dark: #050505; --card: #121212; --white: #ffffff; }
         * { border-radius: 0 !important; box-sizing: border-box; }
-        body { font-family: 'Roboto Mono', monospace; background: var(--dark); color: var(--white); margin: 0; padding-bottom: 50px; }
+        body { font-family: 'Roboto Mono', monospace; background: var(--dark); color: var(--white); margin: 0; padding-bottom: 50px; font-size: 18px; }
         
-        .header { background: var(--red); padding: 15px; text-align: center; border-bottom: 5px solid #000; }
-        .header h1 { margin: 0; font-family: 'Oswald'; text-transform: uppercase; font-size: 1.3rem; text-shadow: 2px 2px #000; }
+        /* HEADER TURBINADO */
+        .header { background: var(--red); padding: 30px; text-align: center; border-bottom: 10px solid #000; box-shadow: 0 5px 15px rgba(255,0,0,0.3); }
+        .header h1 { margin: 0; font-family: 'Oswald'; text-transform: uppercase; font-size: 2.5rem; text-shadow: 4px 4px #000; letter-spacing: 3px; }
         
-        .container { width: 95%; max-width: 800px; background: var(--card); padding: 20px; border: 2px solid var(--red); margin: 15px auto; box-shadow: 8px 8px 0px #000; }
+        .container { width: 95%; max-width: 900px; background: var(--card); padding: 40px; border: 6px double var(--red); margin: 30px auto; box-shadow: 15px 15px 0px #000; }
         
-        input, select, textarea { padding: 12px; margin: 5px 0; border: 2px solid #444; background: #000; color: #fff; width: 100%; font-size: 16px; outline: none; }
-        button { background: var(--red); color: white; border: none; padding: 12px; width: 100%; font-family: 'Oswald'; text-transform: uppercase; cursor: pointer; margin-top: 10px; box-shadow: 4px 4px 0px #000; }
-        button:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px #000; }
+        h3 { font-family: 'Oswald'; border-left: 10px solid var(--red); padding-left: 15px; margin-top: 0; font-size: 2rem; text-transform: uppercase; margin-bottom: 30px; }
 
-        /* MODAL VOLTAR */
-        #modal-back { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center; }
-        .modal-content { background: var(--card); padding: 25px; border: 3px solid var(--red); text-align: center; }
+        /* INPUTS E BOTÕES GIGANTES */
+        input, select { padding: 20px; margin: 10px 0; border: 4px solid #333; background: #000; color: #fff; width: 100%; font-size: 22px; font-weight: bold; }
+        input:focus { border-color: var(--red); outline: none; }
 
-        /* GRID */
-        #rpg-panel { display: none; width: 96%; margin: 10px auto; grid-template-columns: 1fr; gap: 15px; }
-        @media (min-width: 900px) { #rpg-panel { grid-template-columns: 1fr 1fr; } }
+        /* BOTAO DECORADO */
+        .btn-main { 
+            background: var(--red); color: white; border: 4px solid #000; padding: 30px; width: 100%; 
+            font-family: 'Oswald'; text-transform: uppercase; cursor: pointer; margin-top: 20px; 
+            font-size: 1.8rem; box-shadow: 8px 8px 0px #000; position: relative; overflow: hidden;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .btn-main small { font-size: 0.9rem; font-family: 'Roboto Mono'; opacity: 0.8; margin-top: 5px; }
+        .btn-main:active { transform: translate(4px, 4px); box-shadow: 2px 2px 0px #000; }
+        .btn-main:hover { filter: brightness(1.2); }
 
-        .card { background: var(--card); padding: 15px; border: 2px solid #333; }
-        h3 { font-family: 'Oswald'; border-bottom: 2px solid var(--red); padding-bottom: 5px; margin-top: 0; }
+        /* MODAL */
+        #modal-back { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-content { background: var(--card); padding: 50px; border: 8px solid var(--red); text-align: center; width: 90%; max-width: 500px; box-shadow: 0 0 50px rgba(255,0,0,0.2); }
 
-        /* CHAT EM LISTA */
-        #chat-box { height: 300px; overflow-y: auto; background: #000; border: 1px solid #222; padding: 10px; display: flex; flex-direction: column; gap: 5px; }
-        .msg-item { border-left: 3px solid var(--red); padding: 5px 8px; background: #0a0a0a; margin-bottom: 2px; font-size: 0.85rem; }
-        .msg-item b { color: var(--red); display: block; font-size: 0.7rem; }
+        /* PAINEL */
+        #rpg-panel { display: none; width: 98%; margin: 20px auto; grid-template-columns: 1fr; gap: 30px; }
+        @media (min-width: 1100px) { #rpg-panel { grid-template-columns: 1fr 1fr; } }
+
+        .card { background: var(--card); padding: 30px; border: 4px solid #222; position: relative; }
+        .card::after { content: ""; position: absolute; bottom: 0; right: 0; width: 30px; height: 30px; border-right: 5px solid var(--red); border-bottom: 5px solid var(--red); }
+
+        /* CHAT */
+        #chat-box { height: 500px; overflow-y: auto; background: #000; border: 2px solid #111; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+        .msg-item { border-left: 8px solid var(--red); padding: 15px; background: #0a0a0a; font-size: 1.2rem; }
+        .msg-item b { color: var(--red); font-size: 0.8rem; letter-spacing: 1px; }
 
         /* DADO */
-        .dice-box { text-align: center; background: #000; padding: 15px; border: 1px solid #333; }
-        #dice-img { width: 90px; height: 90px; transition: 0.5s; }
-        #dice-res { font-family: 'Oswald'; font-size: 2rem; margin-top: -20px; color: #fff; text-shadow: 0 0 5px var(--red); }
+        .dice-box { text-align: center; background: #000; padding: 40px; border: 2px solid #222; margin-bottom: 15px; }
+        #dice-img { width: 180px; height: 180px; filter: drop-shadow(0 0 10px var(--red)); transition: 0.6s cubic-bezier(0.1, 0.7, 1.0, 0.1); }
+        #dice-res { font-family: 'Oswald'; font-size: 5rem; color: #fff; text-shadow: 0 0 20px var(--red); margin-top: -40px; }
 
-        .hp-bar { height: 15px; background: #222; border: 1px solid #000; margin-top: 5px; }
-        .hp-fill { height: 100%; background: var(--red); transition: 0.3s; }
+        .hp-bar { height: 40px; background: #1a1a1a; border: 3px solid #000; margin: 20px 0; }
+        .hp-fill { height: 100%; background: var(--red); transition: 0.8s ease-out; }
     </style>
 </head>
 <body>
 
     <div id="modal-back">
         <div class="modal-content">
-            <h3>Você quer realmente voltar?</h3>
-            <button onclick="location.reload()">SIM</button>
-            <button onclick="document.getElementById('modal-back').style.display='none'">NÃO</button>
+            <h2 style="font-family:'Oswald'; font-size: 2.5rem;">ENCERRAR SESSÃO?</h2>
+            <p>Todo o progresso não salvo será perdido.</p>
+            <button class="btn-main" onclick="location.reload()" style="background:#2b9348">SIM, SAIR AGORA</button>
+            <button class="btn-main" onclick="document.getElementById('modal-back').style.display='none'">NÃO, CONTINUAR</button>
         </div>
     </div>
 
-    <div class="header"><h1>RPG MASTER TACTICAL</h1></div>
+    <div class="header"><h1>RPG TACTICAL SYSTEM</h1></div>
 
-    <div id="nav-btns" style="width:95%; margin:10px auto; display:none">
-        <button onclick="document.getElementById('modal-back').style.display='flex'" style="width:auto; padding:5px 15px; font-size:0.7rem">⬅ VOLTAR</button>
+    <div id="nav-btns" style="width:95%; margin:20px auto; display:none">
+        <button onclick="document.getElementById('modal-back').style.display='flex'" style="width:auto; padding:15px 40px; font-size:1.2rem; background:#333; box-shadow: 4px 4px 0 #000; cursor:pointer; color:white; border:none;">⬅ VOLTAR</button>
     </div>
 
     <div id="screen-setup" class="container">
-        <h3>Escolha o Modo</h3>
-        <button onclick="isOnline=true; show('screen-lobby')">ONLINE (FIREBASE)</button>
-        <button onclick="isOnline=false; isMaster=true; show('screen-casual')">CASUAL (LOCAL)</button>
+        <h3>INICIALIZAR PROTOCOLO</h3>
+        
+        <button class="btn-main" onclick="isOnline=true; show('screen-lobby')">
+            <span>MODO ONLINE</span>
+            <small>CONECTAR AO SERVIDOR FIREBASE</small>
+        </button>
+
+        <button class="btn-main" onclick="isOnline=false; isMaster=true; show('screen-casual')" style="background:#2b2d42">
+            <span>MODO CASUAL</span>
+            <small>SESSÃO LOCAL (OFFLINE)</small>
+        </button>
     </div>
 
     <div id="screen-lobby" class="container" style="display:none">
-        <h3>Salas Online</h3>
-        <div id="room-list"></div>
-        <input type="text" id="room-name" placeholder="Nome da Sala">
-        <select id="room-theme"></select>
-        <button onclick="criarSala()">CRIAR SALA</button>
+        <h3>SELECIONAR SALA</h3>
+        <div id="room-list" style="margin-bottom:30px; display: grid; grid-template-columns: 1fr; gap: 10px;"></div>
+        <hr style="border-color: #333">
+        <input type="text" id="room-name" placeholder="NOME DA NOVA SALA">
+        <button class="btn-main" onclick="criarSala()">CRIAR NOVA SALA</button>
     </div>
 
     <div id="screen-casual" class="container" style="display:none">
-        <h3>Configuração Local</h3>
-        <select id="casual-theme"></select>
-        <input type="number" id="p-count" value="2">
-        <button onclick="setupFichas(document.getElementById('p-count').value)">GERAR FICHAS</button>
+        <h3>CONFIGURAÇÃO LOCAL</h3>
+        <label>QUANTIDADE DE JOGADORES:</label>
+        <input type="number" id="p-count" value="2" min="1">
+        <button class="btn-main" onclick="setupFichas(document.getElementById('p-count').value)">GERAR FICHAS</button>
     </div>
 
     <div id="screen-fichas" class="container" style="display:none">
-        <h3>Registro de Heróis</h3>
+        <h3>DADOS DOS HERÓIS</h3>
         <div id="fichas-area"></div>
-        <button onclick="iniciarJogo()">INICIAR AVENTURA</button>
+        <button class="btn-main" onclick="iniciarJogo()">ENTRAR NO CAMPO DE BATALHA</button>
     </div>
 
     <div id="rpg-panel">
@@ -96,23 +119,23 @@
         </div>
 
         <div class="card" id="chat-ui">
-            <h3>[CHAT]</h3>
+            <h3>[COMUNICAÇÃO]</h3>
             <div id="chat-box"></div>
-            <div style="display:flex; gap:5px; margin-top:5px">
+            <div style="display:flex; gap:15px; margin-top:20px">
                 <input type="text" id="chat-in" placeholder="Diga algo...">
-                <button onclick="enviar()" style="width:60px; margin:0">OK</button>
+                <button class="btn-main" onclick="enviar()" style="width:180px; margin:0; padding:10px; font-size:1.2rem">ENVIAR</button>
             </div>
         </div>
 
         <div class="card">
-            <h3>[DADOS]</h3>
+            <h3>[DADO]</h3>
             <div class="dice-box">
-                <img src="dado.png" id="dice-img">
+                <img src="dado.png" id="dice-img" onerror="this.src='https://cdn-icons-png.flaticon.com/512/107/107051.png'">
                 <div id="dice-res">--</div>
             </div>
             <div class="master-only" style="display:none">
-                <select id="dice-type"><option value="20">D20</option><option value="6">D6</option></select>
-                <button onclick="rolar()">ROLAR DADO</button>
+                <select id="dice-type"><option value="20">D20</option><option value="6">D6</option><option value="100">D100</option></select>
+                <button class="btn-main" onclick="rolar()" style="padding:20px">ROLAR DADO</button>
             </div>
         </div>
     </div>
@@ -122,10 +145,7 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        let isOnline = false, isMaster = false, room = "", myChar = "", players = [], currentTheme = "";
-
-        const themes = { jujutsu: ["Feiticeiro", "Selo"], onepiece: ["Pirata", "Marinha"], medieval: ["Guerreiro", "Mago"] };
-        ['room-theme', 'casual-theme'].forEach(id => { for(let t in themes) document.getElementById(id).innerHTML += `<option value="${t}">${t.toUpperCase()}</option>`; });
+        let isOnline = false, isMaster = false, room = "", myChar = "", players = [];
 
         function show(id) { 
             document.querySelectorAll('.container, #rpg-panel').forEach(e => e.style.display='none');
@@ -135,16 +155,15 @@
 
         db.ref('rooms').on('value', snap => {
             const l = document.getElementById('room-list'); l.innerHTML = "";
-            snap.forEach(s => l.innerHTML += `<button onclick="entrar('${s.key}')" style="font-size:0.7rem; margin:2px">${s.key}</button>`);
+            snap.forEach(s => l.innerHTML += `<button class="btn-main" onclick="entrar('${s.key}')" style="padding:15px; font-size:1.2rem; margin:0">ENTRAR NA SALA: ${s.key.toUpperCase()}</button>`);
         });
 
-        function entrar(n) { room = n; isMaster = false; db.ref('rooms/'+n+'/theme').once('value', s => { currentTheme = s.val(); setupFichas(1); }); }
+        function entrar(n) { room = n; isMaster = false; setupFichas(1); }
 
         function criarSala() {
             room = document.getElementById('room-name').value;
-            currentTheme = document.getElementById('room-theme').value;
             if(!room) return; isMaster = true;
-            db.ref('rooms/'+room).set({ theme: currentTheme });
+            db.ref('rooms/'+room).set({ t: Date.now() });
             setupFichas(1);
         }
 
@@ -152,22 +171,24 @@
             show('screen-fichas');
             const area = document.getElementById('fichas-area'); area.innerHTML = "";
             for(let i=0; i<qtd; i++) {
-                area.innerHTML += `<div style="border:1px solid #444; padding:10px; margin-bottom:10px">
-                    <input type="text" class="p-nome" placeholder="Nome">
-                    <input type="text" class="p-alt" placeholder="Altura">
-                    <input type="text" class="p-peso" placeholder="Peso">
-                    <input type="number" class="p-hp" value="100">
+                area.innerHTML += `<div style="border:4px solid #444; padding:25px; margin-bottom:25px; background:#000">
+                    <label>NOME:</label><input type="text" class="p-nome" placeholder="Nome">
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px">
+                        <div><label>ALTURA:</label><input type="text" class="p-alt" placeholder="1.80m"></div>
+                        <div><label>PESO:</label><input type="text" class="p-peso" placeholder="80kg"></div>
+                    </div>
+                    <label>HP:</label><input type="number" class="p-hp" value="100">
                 </div>`;
             }
         }
 
         function iniciarJogo() {
-            const nomes = document.querySelectorAll('.p-nome'), hps = document.querySelectorAll('.p-hp'), alts = document.querySelectorAll('.p-alt'), pes = document.querySelectorAll('.p-peso');
+            const ns = document.querySelectorAll('.p-nome'), hps = document.querySelectorAll('.p-hp'), alts = document.querySelectorAll('.p-alt'), pes = document.querySelectorAll('.p-peso');
             if(isOnline) {
-                myChar = nomes[0].value || "Player";
+                myChar = ns[0].value || "Player";
                 db.ref(`rooms/${room}/players/${myChar}`).set({ nome: myChar, hp: parseInt(hps[0].value), max: parseInt(hps[0].value), alt: alts[0].value, peso: pes[0].value });
             } else {
-                nomes.forEach((n, i) => players.push({ nome: n.value, hp: parseInt(hps[i].value), max: parseInt(hps[i].value), alt: alts[i].value, peso: pes[i].value }));
+                ns.forEach((n, i) => players.push({ nome: n.value, hp: parseInt(hps[i].value), max: parseInt(hps[i].value), alt: alts[i].value, peso: pes[i].value }));
                 document.getElementById('chat-ui').style.display = 'none';
             }
             show('rpg-panel');
@@ -178,25 +199,30 @@
                     const l = document.getElementById('player-list'); l.innerHTML = "";
                     snap.forEach(p => {
                         const d = p.val(); const pct = (d.hp/d.max)*100;
-                        l.innerHTML += `<div style="margin-bottom:10px"><b>${d.nome}</b> (${d.hp}HP) <br><small>${d.alt} | ${d.peso}</small>
-                        <div class="hp-bar"><div class="hp-fill" style="width:${pct}%"></div></div>
-                        ${isMaster ? `<button onclick="db.ref('rooms/${room}/players/${d.nome}/hp').transaction(c=>(c||0)-10)" style="padding:2px; font-size:0.6rem">-10 HP</button>` : ''}</div>`;
+                        l.innerHTML += `<div class="card" style="margin-bottom:20px; border-color:var(--red)">
+                            <b style="font-size:1.5rem">${d.nome.toUpperCase()}</b> <span style="float:right">${d.hp}/${d.max}</span><br>
+                            <small>${d.alt} | ${d.peso}</small>
+                            <div class="hp-bar"><div class="hp-fill" style="width:${pct}%"></div></div>
+                            ${isMaster ? `<button class="btn-main" onclick="updateHP('${d.nome}', -10)" style="padding:10px; font-size:1rem; width:120px; display:inline-block">DANO -10</button>` : ''}
+                        </div>`;
                     });
                 });
                 db.ref(`rooms/${room}/chat`).on('child_added', snap => {
                     const b = document.getElementById('chat-box');
-                    b.innerHTML += `<div class="msg-item"><b>${snap.val().u}</b> ${snap.val().t}</div>`;
+                    b.innerHTML += `<div class="msg-item"><b>${snap.val().u}</b><br>${snap.val().t}</div>`;
                     b.scrollTop = b.scrollHeight;
                 });
                 db.ref(`rooms/${room}/dice`).on('value', snap => { if(snap.val()) document.getElementById('dice-res').innerText = snap.val(); });
             } else { renderLocal(); }
         }
 
+        function updateHP(n, v) { db.ref(`rooms/${room}/players/${n}/hp`).transaction(c => (c||0) + v); }
+
         function renderLocal() {
             const l = document.getElementById('player-list'); l.innerHTML = "";
             players.forEach((p, i) => {
-                l.innerHTML += `<div><b>${p.nome}</b> (${p.hp}HP)<div class="hp-bar"><div class="hp-fill" style="width:${(p.hp/p.max)*100}%"></div></div>
-                <button onclick="players[${i}].hp-=10; renderLocal()">-10 HP</button></div>`;
+                l.innerHTML += `<div class="card"><b>${p.nome}</b> [${p.hp} HP]<div class="hp-bar"><div class="hp-fill" style="width:${(p.hp/p.max)*100}%"></div></div>
+                <button class="btn-main" onclick="players[${i}].hp-=10; renderLocal()" style="padding:10px; font-size:1rem; width:120px">DANO -10</button></div>`;
             });
         }
 
@@ -210,12 +236,15 @@
             const d = document.getElementById('dice-type').value;
             const r = Math.floor(Math.random() * d) + 1;
             const img = document.getElementById('dice-img');
-            img.style.transform = "rotate(360deg)";
+            img.style.transform = "rotate(1080deg) scale(0.7)";
             setTimeout(() => {
-                img.style.transform = "rotate(0deg)";
+                img.style.transform = "rotate(0deg) scale(1)";
                 document.getElementById('dice-res').innerText = r;
-                if(isOnline) db.ref(`rooms/${room}/dice`).set(r);
-            }, 500);
+                if(isOnline) {
+                    db.ref(`rooms/${room}/dice`).set(r);
+                    db.ref(`rooms/${room}/chat`).push({ u: "SISTEMA", t: `🎲 ROLAGEM D${d}: [ ${r} ]` });
+                }
+            }, 600);
         }
     </script>
 </body>
