@@ -11,7 +11,8 @@
             --dark: #0b090a; 
             --card: #161a1d; 
             --white: #f5f3f4; 
-            --border: #333;
+            --border: #444;
+            --accent: #ef233c;
         }
 
         body { 
@@ -22,71 +23,71 @@
             display: flex; flex-direction: column; align-items: center; 
         }
         
-        /* Layout Quadrado */
         .header { 
             background: var(--red); 
-            width: 100%; padding: 20px 0; 
-            text-align: center; border-bottom: 4px solid #800000;
+            width: 100%; padding: 25px 0; 
+            text-align: center; border-bottom: 5px solid #000;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
         }
-        .header h1 { margin: 0; font-family: 'Oswald'; text-transform: uppercase; letter-spacing: 1px; }
+        .header h1 { margin: 0; font-family: 'Oswald'; text-transform: uppercase; letter-spacing: 2px; }
 
         .container { 
-            max-width: 650px; width: 90%; 
+            max-width: 700px; width: 90%; 
             background: var(--card); 
-            padding: 30px; 
-            border: 2px solid var(--border); /* Visual Quadrado */
+            padding: 35px; 
+            border: 3px solid var(--red); 
             margin: 40px 20px; 
-            box-shadow: 10px 10px 0px rgba(0,0,0,1); /* Sombra bloco */
+            box-shadow: 12px 12px 0px #000;
         }
 
-        h2 { font-family: 'Oswald'; text-transform: uppercase; border-bottom: 2px solid var(--red); padding-bottom: 5px; margin-top: 0; }
+        h2 { font-family: 'Oswald'; text-transform: uppercase; border-bottom: 2px solid var(--red); padding-bottom: 10px; margin-bottom: 20px; color: #fff; }
         
-        label { display: block; margin-top: 15px; font-weight: bold; color: var(--red); text-align: left; font-size: 0.85rem; }
+        label { display: block; margin-top: 15px; font-weight: bold; color: var(--red); text-align: left; font-size: 0.85rem; letter-spacing: 1px; }
         
         select, input, textarea { 
-            padding: 12px; margin: 8px 0; 
+            padding: 14px; margin: 8px 0; 
             border: 2px solid var(--border); 
             background: #000; color: #fff; 
             width: 100%; box-sizing: border-box; 
-            border-radius: 0; /* Remove arredondamento */
+            border-radius: 0; outline: none;
         }
+        select:focus, input:focus { border-color: var(--red); }
 
-        /* Correção do Botão */
         button { 
             background: var(--red); 
             color: white; border: none; 
-            padding: 15px; width: 100%; 
-            font-family: 'Oswald'; font-size: 1.1rem; 
+            padding: 18px; width: 100%; 
+            font-family: 'Oswald'; font-size: 1.2rem; 
             text-transform: uppercase; cursor: pointer; 
-            margin-top: 20px; transition: 0.2s;
-            display: block; /* Garante que ocupe a linha */
+            margin-top: 25px; display: block;
+            box-shadow: 4px 4px 0px #800000;
         }
-        button:hover { background: #ff002b; outline: 2px solid white; }
+        button:hover { background: var(--accent); transform: translate(-2px, -2px); box-shadow: 6px 6px 0px #000; }
 
         .player-card-input { 
-            border: 2px solid var(--red); 
-            padding: 15px; margin-bottom: 20px; 
-            display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+            border: 2px solid #555; 
+            background: #1e1e1e;
+            padding: 20px; margin-bottom: 25px; 
+            display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
         }
 
-        #rpg-panel { display: none; width: 98%; max-width: 1300px; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 15px; padding: 20px; }
-        .card { background: var(--card); padding: 20px; border: 2px solid var(--border); }
+        #rpg-panel { display: none; width: 98%; max-width: 1300px; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px; padding: 25px; }
+        .card { background: var(--card); padding: 25px; border: 2px solid var(--red); box-shadow: 8px 8px 0px #000; }
 
-        /* HP Bar Square */
-        .hp-bar-bg { height: 25px; background: #222; border: 2px solid #000; position: relative; }
-        .hp-bar-fill { height: 100%; background: var(--red); width: 100%; transition: 0.3s; }
+        .hp-bar-bg { height: 30px; background: #222; border: 2px solid #000; position: relative; margin: 10px 0; }
+        .hp-bar-fill { height: 100%; background: var(--red); width: 100%; transition: 0.4s ease; }
 
-        .dice-box { width: 100px; height: 100px; border: 3px solid var(--red); margin: 20px auto; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; font-weight: bold; }
+        .dice-box { width: 120px; height: 120px; border: 4px solid var(--red); background: #000; margin: 20px auto; display: flex; align-items: center; justify-content: center; font-size: 3rem; font-family: 'Oswald'; color: #fff; box-shadow: 5px 5px 0px #000; }
         
-        .notes-area { grid-column: 1 / -1; background: #000; border: 1px dashed var(--red); padding: 15px; margin-top: 20px; }
+        .notes-area { grid-column: 1 / -1; background: #000; border: 2px dashed var(--red); padding: 20px; margin-top: 25px; }
     </style>
 </head>
 <body>
 
-    <div class="header"><h1>Mestre de RPG - Terminal</h1></div>
+    <div class="header"><h1>Painel do Mestre Online</h1></div>
 
     <div id="step1" class="container">
-        <h2>Configurar Sessão</h2>
+        <h2>Configuração de Sessão</h2>
         <label>ESTILO DO RPG</label>
         <select id="rpg-style">
             <option value="jujutsu">Jujutsu Kaisen</option>
@@ -101,55 +102,59 @@
             <option value="Não">Não</option>
         </select>
 
-        <label>DURAÇÃO</label>
+        <label>DURAÇÃO DA CAMPANHA</label>
         <select id="duration">
-            <option value="1 dia">1 Dia</option>
-            <option value="1 semana">1 Semana</option>
-            <option value="1 mes">1 Mês</option>
-            <option value="5 meses">5 Meses</option>
-        </select>
+            </select>
 
-        <label>QTD. JOGADORES</label>
-        <input type="number" id="p-count" value="2">
-
-        <label>HP INICIAL</label>
-        <input type="number" id="p-hp-base" value="100">
+        <label>QUANTIDADE DE JOGADORES</label>
+        <input type="number" id="p-count" value="2" min="1">
 
         <button onclick="proximoPasso()">Configurar Jogadores</button>
     </div>
 
-    <div id="step2" class="container" style="display:none;">
-        <h2>Fichas Técnicas</h2>
+    <div id="step2" class="container" style="display:none; max-width: 850px;">
+        <h2>Fichas dos Personagens</h2>
         <div id="inputs-container"></div>
-        <button onclick="confirmarFichas()">Finalizar Configuração</button>
+        <button onclick="confirmarFichas()">Finalizar e Abrir Painel</button>
     </div>
 
     <div id="rpg-panel">
         <div class="card">
-            <h3>[STATUS DOS JOGADORES]</h3>
+            <h3>[STATUS DO GRUPO]</h3>
             <div id="final-hp-list"></div>
         </div>
 
         <div class="card">
-            <h3>[DADOS E LOGS]</h3>
-            <select id="dado-seletor"><option value="20">D20</option><option value="6">D6</option></select>
+            <h3>[DADOS E FERRAMENTAS]</h3>
+            <label>SELECIONAR DADO</label>
+            <select id="dado-seletor">
+                <option value="2">D2</option>
+                <option value="4">D4</option>
+                <option value="6">D6</option>
+                <option value="8">D8</option>
+                <option value="15">D15</option>
+                <option value="20" selected>D20</option>
+            </select>
             <div id="dice-result" class="dice-box">--</div>
             <button onclick="jogarDado()">Rolar Dado</button>
             
             <div class="notes-area">
-                <label style="margin:0">NOTAS DO MESTRE</label>
-                <textarea id="master-notes" rows="10" placeholder="Escreva aqui eventos importantes..."></textarea>
+                <label style="margin:0">NOTAS DA AVENTURA</label>
+                <textarea id="master-notes" rows="8" placeholder="Digite aqui o resumo da história..."></textarea>
             </div>
         </div>
     </div>
 
     <script>
-        let finalOrder = [];
-        let maxHP = 100;
+        // Gerador de Duração Sem Pular Nada
+        const durationSelect = document.getElementById('duration');
+        for(let d=1; d<=30; d++) durationSelect.innerHTML += `<option value="${d} dias">${d} Dia(s)</option>`;
+        for(let m=1; m<=5; m++) durationSelect.innerHTML += `<option value="${m} meses">${m} Mês(es)</option>`;
 
+        let finalOrder = [];
         const classesData = {
             medieval: ["Viking", "Arqueiro", "Mago", "Guerreiro", "Ladino", "Paladino", "Bárbaro", "Bardo", "Druida", "Monge", "Feiticeiro", "Necromante", "Alquimista"],
-            jujutsu: ["Feiticeiro", "Usuário de Maldição", "Maldição", "Restrição Celestial", "Xamã", "Invocador", "Mestre de Barreiras", "Grau 1", "Grau 2", "Grau 3", "Grau 4", "Especial", "Corpo Amaldiçoado"],
+            jujutsu: ["Feiticeiro", "Usuário de Maldição", "Maldição", "Restrição Celestial", "Xamã", "Invocador", "Mestre de Barreiras", "Grau Especial", "Grau 1", "Grau 2", "Grau 3", "Grau 4", "Corpo Amaldiçoado"],
             slasher: ["Médico", "Militar", "Estudante", "Policial", "Sobrevivente", "Cozinheiro", "Mecânico", "Zelador", "Atleta", "Nerd", "Popular", "Cético", "Repórter"],
             roça: ["Vaqueiro", "Peão", "Benzedeira", "Fazendeiro", "Mateiro", "Violeiro", "Capataz", "Agrônomo", "Veterinário", "Pescador", "Lenhador", "Artesão", "Caminhoneiro"]
         };
@@ -157,22 +162,22 @@
         function proximoPasso() {
             const qtd = parseInt(document.getElementById('p-count').value);
             const style = document.getElementById('rpg-style').value;
-            maxHP = parseInt(document.getElementById('p-hp-base').value) || 100;
             const area = document.getElementById('inputs-container');
             area.innerHTML = '';
-            
             const classes = classesData[style] || classesData.medieval;
 
             for(let i=0; i<qtd; i++) {
                 let options = classes.map(c => `<option value="${c}">${c}</option>`).join('');
                 area.innerHTML += `
                     <div class="player-card-input">
-                        <input type="text" placeholder="Nome" class="in-nome" style="grid-column: span 2">
-                        <input type="number" placeholder="Idade" class="in-idade">
+                        <div style="grid-column: span 2; color:var(--red); font-weight:bold; border-bottom: 1px solid #444; margin-bottom:5px">PLAYER ${i+1}</div>
+                        <input type="text" placeholder="Nome do Personagem" class="in-nome" style="grid-column: span 2">
                         <select class="in-classe">${options}</select>
+                        <input type="number" placeholder="HP Inicial (Vida)" class="in-hp" value="100">
+                        <input type="text" placeholder="Idade" class="in-idade">
                         <input type="text" placeholder="Altura" class="in-altura">
                         <input type="text" placeholder="Peso" class="in-peso">
-                        <input type="number" placeholder="${style==='jujutsu'?'Energia':'Atributo'}" class="in-extra" style="grid-column: span 2">
+                        <input type="text" placeholder="${style==='jujutsu'?'Energia Amaldiçoada':'Poder Especial'}" class="in-extra">
                     </div>`;
             }
             document.getElementById('step1').style.display = 'none';
@@ -182,12 +187,14 @@
         function confirmarFichas() {
             const cards = document.querySelectorAll('.player-card-input');
             finalOrder = [];
-            cards.forEach((card, i) => {
+            cards.forEach((card) => {
+                let hpVal = parseInt(card.querySelector('.in-hp').value) || 100;
                 finalOrder.push({
-                    nome: card.querySelector('.in-nome').value || `J${i+1}`,
+                    nome: card.querySelector('.in-nome').value || "Herói",
                     classe: card.querySelector('.in-classe').value,
-                    hp: maxHP,
-                    extra: card.querySelector('.in-extra').value || 0
+                    hp: hpVal,
+                    maxHp: hpVal,
+                    extra: card.querySelector('.in-extra').value || "Nenhum"
                 });
             });
             document.getElementById('step2').style.display = 'none';
@@ -200,32 +207,44 @@
             container.innerHTML = '';
             finalOrder.forEach((p, i) => {
                 container.innerHTML += `
-                    <div style="border: 1px solid #444; padding: 10px; margin-bottom: 10px;">
+                    <div style="border: 2px solid #444; padding: 15px; margin-bottom: 15px; background: #000">
                         <div style="display:flex; justify-content:space-between; margin-bottom:5px">
-                            <span><b>${p.nome}</b> (${p.classe})</span>
-                            <span id="num-hp-${i}">${p.hp}/${maxHP}</span>
+                            <span style="color:var(--red)"><b>${p.nome.toUpperCase()}</b></span>
+                            <span id="num-hp-${i}">${p.hp}/${p.maxHp}</span>
                         </div>
+                        <div style="font-size:0.75rem; color:#aaa; margin-bottom:5px">${p.classe} | Info: ${p.extra}</div>
                         <div class="hp-bar-bg"><div id="bar-fill-${i}" class="hp-bar-fill"></div></div>
-                        <div style="display:flex; gap:5px; margin-top:5px;">
-                            <button onclick="mudarVida(${i}, -10)" style="flex:1; padding:5px; margin:0">-10</button>
-                            <button onclick="mudarVida(${i}, 10)" style="flex:1; padding:5px; margin:0; background:#1b4332">+10</button>
+                        <div style="display:flex; gap:10px; margin-top:10px;">
+                            <button onclick="mudarVida(${i}, -10)" style="flex:1; padding:8px; margin:0; font-size:0.9rem; background:#440000">-10 HP</button>
+                            <button onclick="mudarVida(${i}, 10)" style="flex:1; padding:8px; margin:0; font-size:0.9rem; background:#1b4332">+10 HP</button>
                         </div>
-                        <textarea placeholder="Inventário..." style="margin-top:10px; height:60px; font-size:0.7rem"></textarea>
+                        <textarea placeholder="Inventário e Itens..." style="margin-top:10px; height:70px; font-size:0.75rem; border-color:#333"></textarea>
                     </div>`;
             });
         }
 
         function mudarVida(idx, valor) {
-            finalOrder[idx].hp = Math.max(0, Math.min(maxHP, finalOrder[idx].hp + valor));
-            const pct = (finalOrder[idx].hp / maxHP) * 100;
+            let p = finalOrder[idx];
+            p.hp = Math.max(0, Math.min(p.maxHp, p.hp + valor));
+            const pct = (p.hp / p.maxHp) * 100;
             document.getElementById(`bar-fill-${idx}`).style.width = pct + "%";
-            document.getElementById(`num-hp-${idx}`).innerText = `${finalOrder[idx].hp}/${maxHP}`;
+            document.getElementById(`num-hp-${idx}`).innerText = `${p.hp}/${p.maxHp}`;
+            
+            // Cor dinâmica da barra
+            const fill = document.getElementById(`bar-fill-${idx}`);
+            if(pct < 30) fill.style.background = "#d90429";
+            else if(pct < 60) fill.style.background = "#ffb703";
+            else fill.style.background = "#38b000";
         }
 
         function jogarDado() {
             const lados = document.getElementById('dado-seletor').value;
-            const res = Math.floor(Math.random() * lados) + 1;
-            document.getElementById('dice-result').innerText = res;
+            const resDisplay = document.getElementById('dice-result');
+            resDisplay.innerText = "...";
+            setTimeout(() => {
+                const res = Math.floor(Math.random() * lados) + 1;
+                resDisplay.innerText = res;
+            }, 300);
         }
     </script>
 </body>
