@@ -3,248 +3,180 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RPG Master - Tactical Interface</title>
+    <title>RPG Master - Cloud System</title>
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
     <style>
-        :root { 
-            --red: #d90429; 
-            --dark: #0b090a; 
-            --card: #161a1d; 
-            --white: #f5f3f4; 
-            --border: #444;
-            --accent: #ef233c;
-        }
+        :root { --red: #d90429; --dark: #0b090a; --card: #161a1d; --white: #f5f3f4; --border: #444; }
+        * { border-radius: 0 !important; } /* Interface Quadrada */
 
-        body { 
-            font-family: 'Roboto Mono', monospace; 
-            background: var(--dark); 
-            color: var(--white); 
-            margin: 0; padding: 0; 
-            display: flex; flex-direction: column; align-items: center; 
-        }
-        
-        .header { 
-            background: var(--red); 
-            width: 100%; padding: 25px 0; 
-            text-align: center; border-bottom: 5px solid #000;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-        }
-        .header h1 { margin: 0; font-family: 'Oswald'; text-transform: uppercase; letter-spacing: 2px; }
+        body { font-family: 'Roboto Mono', monospace; background: var(--dark); color: var(--white); margin: 0; display: flex; flex-direction: column; align-items: center; }
+        .header { background: var(--red); width: 100%; padding: 20px 0; text-align: center; border-bottom: 5px solid #000; }
+        .container { max-width: 750px; width: 90%; background: var(--card); padding: 30px; border: 3px solid var(--red); margin: 40px 20px; box-shadow: 10px 10px 0px #000; }
+        h2, h3 { font-family: 'Oswald'; text-transform: uppercase; border-bottom: 2px solid var(--red); padding-bottom: 5px; }
+        label { display: block; margin-top: 15px; font-weight: bold; color: var(--red); font-size: 0.8rem; }
+        select, input, textarea { padding: 12px; margin: 8px 0; border: 2px solid var(--border); background: #000; color: #fff; width: 100%; box-sizing: border-box; }
+        button { background: var(--red); color: white; border: none; padding: 15px; width: 100%; font-family: 'Oswald'; font-size: 1.1rem; text-transform: uppercase; cursor: pointer; margin-top: 10px; box-shadow: 4px 4px 0px #000; }
 
-        .container { 
-            max-width: 700px; width: 90%; 
-            background: var(--card); 
-            padding: 35px; 
-            border: 3px solid var(--red); 
-            margin: 40px 20px; 
-            box-shadow: 12px 12px 0px #000;
-        }
+        #rpg-panel { display: none; width: 95%; max-width: 1300px; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; padding: 20px; }
+        .card { background: var(--card); padding: 20px; border: 2px solid var(--red); box-shadow: 8px 8px 0px #000; }
 
-        h2 { font-family: 'Oswald'; text-transform: uppercase; border-bottom: 2px solid var(--red); padding-bottom: 10px; margin-bottom: 20px; color: #fff; }
-        
-        label { display: block; margin-top: 15px; font-weight: bold; color: var(--red); text-align: left; font-size: 0.85rem; letter-spacing: 1px; }
-        
-        select, input, textarea { 
-            padding: 14px; margin: 8px 0; 
-            border: 2px solid var(--border); 
-            background: #000; color: #fff; 
-            width: 100%; box-sizing: border-box; 
-            border-radius: 0; outline: none;
-        }
-        select:focus, input:focus { border-color: var(--red); }
-
-        button { 
-            background: var(--red); 
-            color: white; border: none; 
-            padding: 18px; width: 100%; 
-            font-family: 'Oswald'; font-size: 1.2rem; 
-            text-transform: uppercase; cursor: pointer; 
-            margin-top: 25px; display: block;
-            box-shadow: 4px 4px 0px #800000;
-        }
-        button:hover { background: var(--accent); transform: translate(-2px, -2px); box-shadow: 6px 6px 0px #000; }
-
-        .player-card-input { 
-            border: 2px solid #555; 
-            background: #1e1e1e;
-            padding: 20px; margin-bottom: 25px; 
-            display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
-        }
-
-        #rpg-panel { display: none; width: 98%; max-width: 1300px; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px; padding: 25px; }
-        .card { background: var(--card); padding: 25px; border: 2px solid var(--red); box-shadow: 8px 8px 0px #000; }
-
-        .hp-bar-bg { height: 30px; background: #222; border: 2px solid #000; position: relative; margin: 10px 0; }
-        .hp-bar-fill { height: 100%; background: var(--red); width: 100%; transition: 0.4s ease; }
-
-        .dice-box { width: 120px; height: 120px; border: 4px solid var(--red); background: #000; margin: 20px auto; display: flex; align-items: center; justify-content: center; font-size: 3rem; font-family: 'Oswald'; color: #fff; box-shadow: 5px 5px 0px #000; }
-        
-        .notes-area { grid-column: 1 / -1; background: #000; border: 2px dashed var(--red); padding: 20px; margin-top: 25px; }
+        #chat-box { height: 300px; overflow-y: auto; border: 2px solid #333; background: #000; padding: 10px; font-size: 0.85rem; margin-bottom: 10px; border-left: 5px solid var(--red); }
+        .msg { margin-bottom: 8px; border-bottom: 1px solid #222; padding-bottom: 4px; }
+        .hp-bar-bg { height: 20px; background: #222; border: 1px solid #000; margin: 5px 0; }
+        .hp-bar-fill { height: 100%; background: var(--red); width: 100%; transition: 0.4s; }
+        .dice-box { width: 80px; height: 80px; border: 3px solid var(--red); margin: 10px auto; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; font-family: 'Oswald'; background: #000; }
     </style>
 </head>
 <body>
 
-    <div class="header"><h1>Painel do Mestre Online</h1></div>
+    <div class="header"><h1>Painel Master - Cloud Sync</h1></div>
 
     <div id="step1" class="container">
-        <h2>Configuração de Sessão</h2>
-        <label>ESTILO DO RPG</label>
-        <select id="rpg-style">
-            <option value="jujutsu">Jujutsu Kaisen</option>
-            <option value="medieval">Medieval</option>
-            <option value="slasher">Slasher</option>
-            <option value="roça">Aventuras na Roça</option>
-        </select>
-
-        <label>ONE SHOT?</label>
-        <select id="one-shot">
-            <option value="Sim">Sim</option>
-            <option value="Não">Não</option>
-        </select>
-
-        <label>DURAÇÃO DA CAMPANHA</label>
-        <select id="duration">
-            </select>
-
-        <label>QUANTIDADE DE JOGADORES</label>
-        <input type="number" id="p-count" value="2" min="1">
-
+        <h2>Configuração da Sessão</h2>
+        <label>Duração da Campanha</label>
+        <select id="duration"></select>
+        <label>Quantidade de Jogadores</label>
+        <input type="number" id="p-count" value="2">
         <button onclick="proximoPasso()">Configurar Jogadores</button>
     </div>
 
-    <div id="step2" class="container" style="display:none; max-width: 850px;">
-        <h2>Fichas dos Personagens</h2>
+    <div id="step2" class="container" style="display:none;">
+        <h2>Fichas & HP Inicial</h2>
         <div id="inputs-container"></div>
-        <button onclick="confirmarFichas()">Finalizar e Abrir Painel</button>
+        <button onclick="confirmarFichas()">Iniciar Sistema Sincronizado</button>
     </div>
 
     <div id="rpg-panel">
         <div class="card">
-            <h3>[STATUS DO GRUPO]</h3>
+            <h3>[STATUS DOS JOGADORES]</h3>
             <div id="final-hp-list"></div>
+            
+            <div style="margin-top: 20px;">
+                <h3>[NOTAS DO MESTRE]</h3>
+                <textarea id="master-notes" style="height: 250px;" placeholder="Anote aqui a história e itens..."></textarea>
+            </div>
         </div>
 
         <div class="card">
-            <h3>[DADOS E FERRAMENTAS]</h3>
-            <label>SELECIONAR DADO</label>
-            <select id="dado-seletor">
-                <option value="2">D2</option>
-                <option value="4">D4</option>
-                <option value="6">D6</option>
-                <option value="8">D8</option>
-                <option value="15">D15</option>
-                <option value="20" selected>D20</option>
-            </select>
-            <div id="dice-result" class="dice-box">--</div>
-            <button onclick="jogarDado()">Rolar Dado</button>
-            
-            <div class="notes-area">
-                <label style="margin:0">NOTAS DA AVENTURA</label>
-                <textarea id="master-notes" rows="8" placeholder="Digite aqui o resumo da história..."></textarea>
+            <h3>[CHAT EM TEMPO REAL]</h3>
+            <div id="chat-box"></div>
+            <div style="display:flex; gap:5px">
+                <input type="text" id="chat-input" placeholder="Enviar mensagem...">
+                <button onclick="enviarMensagem()" style="margin:0; width:80px">OK</button>
+            </div>
+
+            <div style="margin-top: 20px;">
+                <h3>[SISTEMA DE DADOS]</h3>
+                <select id="dado-seletor">
+                    <option value="2">D2</option><option value="4">D4</option>
+                    <option value="6">D6</option><option value="8">D8</option>
+                    <option value="15">D15</option><option value="20" selected>D20</option>
+                </select>
+                <div id="dice-result" class="dice-box">--</div>
+                <button onclick="jogarDado()">Rolar</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Gerador de Duração Sem Pular Nada
-        const durationSelect = document.getElementById('duration');
-        for(let d=1; d<=30; d++) durationSelect.innerHTML += `<option value="${d} dias">${d} Dia(s)</option>`;
-        for(let m=1; m<=5; m++) durationSelect.innerHTML += `<option value="${m} meses">${m} Mês(es)</option>`;
-
-        let finalOrder = [];
-        const classesData = {
-            medieval: ["Viking", "Arqueiro", "Mago", "Guerreiro", "Ladino", "Paladino", "Bárbaro", "Bardo", "Druida", "Monge", "Feiticeiro", "Necromante", "Alquimista"],
-            jujutsu: ["Feiticeiro", "Usuário de Maldição", "Maldição", "Restrição Celestial", "Xamã", "Invocador", "Mestre de Barreiras", "Grau Especial", "Grau 1", "Grau 2", "Grau 3", "Grau 4", "Corpo Amaldiçoado"],
-            slasher: ["Médico", "Militar", "Estudante", "Policial", "Sobrevivente", "Cozinheiro", "Mecânico", "Zelador", "Atleta", "Nerd", "Popular", "Cético", "Repórter"],
-            roça: ["Vaqueiro", "Peão", "Benzedeira", "Fazendeiro", "Mateiro", "Violeiro", "Capataz", "Agrônomo", "Veterinário", "Pescador", "Lenhador", "Artesão", "Caminhoneiro"]
+        // CONFIGURAÇÃO DO SEU NOVO PROJETO (meudadovirtualok)
+        const firebaseConfig = {
+            apiKey: "AIzaSyA3-yiNczMAF4sdZ9kog4ovXc75fciaN2g",
+            authDomain: "meudadovirtualok.firebaseapp.com",
+            projectId: "meudadovirtualok",
+            storageBucket: "meudadovirtualok.firebasestorage.app",
+            messagingSenderId: "696487273882",
+            appId: "1:305103444648:web:75865e94be71676d6ec555",
+            databaseURL: "https://meudadovirtualok-default-rtdb.firebaseio.com/"
         };
+        
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Duração 1 dia a 5 meses sem pular
+        const durSel = document.getElementById('duration');
+        for(let d=1; d<=30; d++) durSel.innerHTML += `<option value="${d} dias">${d} Dia(s)</option>`;
+        for(let m=1; m<=5; m++) durSel.innerHTML += `<option value="${m} meses">${m} Mês(es)</option>`;
+
+        let players = [];
 
         function proximoPasso() {
-            const qtd = parseInt(document.getElementById('p-count').value);
-            const style = document.getElementById('rpg-style').value;
+            const qtd = document.getElementById('p-count').value;
             const area = document.getElementById('inputs-container');
             area.innerHTML = '';
-            const classes = classesData[style] || classesData.medieval;
-
             for(let i=0; i<qtd; i++) {
-                let options = classes.map(c => `<option value="${c}">${c}</option>`).join('');
                 area.innerHTML += `
-                    <div class="player-card-input">
-                        <div style="grid-column: span 2; color:var(--red); font-weight:bold; border-bottom: 1px solid #444; margin-bottom:5px">PLAYER ${i+1}</div>
-                        <input type="text" placeholder="Nome do Personagem" class="in-nome" style="grid-column: span 2">
-                        <select class="in-classe">${options}</select>
-                        <input type="number" placeholder="HP Inicial (Vida)" class="in-hp" value="100">
-                        <input type="text" placeholder="Idade" class="in-idade">
-                        <input type="text" placeholder="Altura" class="in-altura">
-                        <input type="text" placeholder="Peso" class="in-peso">
-                        <input type="text" placeholder="${style==='jujutsu'?'Energia Amaldiçoada':'Poder Especial'}" class="in-extra">
+                    <div style="border: 1px solid #555; padding: 10px; margin-bottom: 10px; background: #1a1a1a;">
+                        <input type="text" class="in-nome" placeholder="Nome do Personagem">
+                        <input type="number" class="in-hp" placeholder="HP Inicial" value="100">
                     </div>`;
             }
-            document.getElementById('step1').style.display = 'none';
-            document.getElementById('step2').style.display = 'block';
+            document.getElementById('step1').style.display='none';
+            document.getElementById('step2').style.display='block';
         }
 
         function confirmarFichas() {
-            const cards = document.querySelectorAll('.player-card-input');
-            finalOrder = [];
-            cards.forEach((card) => {
-                let hpVal = parseInt(card.querySelector('.in-hp').value) || 100;
-                finalOrder.push({
-                    nome: card.querySelector('.in-nome').value || "Herói",
-                    classe: card.querySelector('.in-classe').value,
-                    hp: hpVal,
-                    maxHp: hpVal,
-                    extra: card.querySelector('.in-extra').value || "Nenhum"
-                });
+            const nomes = document.querySelectorAll('.in-nome');
+            const hps = document.querySelectorAll('.in-hp');
+            players = [];
+            nomes.forEach((n, i) => {
+                let v = parseInt(hps[i].value) || 100;
+                players.push({ nome: n.value || `Player ${i+1}`, hp: v, maxHp: v });
             });
-            document.getElementById('step2').style.display = 'none';
-            document.getElementById('rpg-panel').style.display = 'grid';
-            carregarPainel();
+            document.getElementById('step2').style.display='none';
+            document.getElementById('rpg-panel').style.display='grid';
+            renderizarPainel();
+            ouvirChat();
         }
 
-        function carregarPainel() {
-            const container = document.getElementById('final-hp-list');
-            container.innerHTML = '';
-            finalOrder.forEach((p, i) => {
-                container.innerHTML += `
-                    <div style="border: 2px solid #444; padding: 15px; margin-bottom: 15px; background: #000">
-                        <div style="display:flex; justify-content:space-between; margin-bottom:5px">
-                            <span style="color:var(--red)"><b>${p.nome.toUpperCase()}</b></span>
-                            <span id="num-hp-${i}">${p.hp}/${p.maxHp}</span>
+        function renderizarPainel() {
+            const list = document.getElementById('final-hp-list');
+            list.innerHTML = '';
+            players.forEach((p, i) => {
+                list.innerHTML += `
+                    <div style="margin-bottom: 10px; background:#000; padding:10px; border: 1px solid #333">
+                        <b>${p.nome}</b> <span id="val-hp-${i}">${p.hp}/${p.maxHp}</span>
+                        <div class="hp-bar-bg"><div id="fill-${i}" class="hp-bar-fill"></div></div>
+                        <div style="display:flex; gap:5px">
+                            <button onclick="mudarVida(${i},-10)" style="margin:0; padding:5px; font-size:0.75rem">-10 HP</button>
+                            <button onclick="mudarVida(${i},10)" style="margin:0; padding:5px; font-size:0.75rem; background:#1b4332">+10 HP</button>
                         </div>
-                        <div style="font-size:0.75rem; color:#aaa; margin-bottom:5px">${p.classe} | Info: ${p.extra}</div>
-                        <div class="hp-bar-bg"><div id="bar-fill-${i}" class="hp-bar-fill"></div></div>
-                        <div style="display:flex; gap:10px; margin-top:10px;">
-                            <button onclick="mudarVida(${i}, -10)" style="flex:1; padding:8px; margin:0; font-size:0.9rem; background:#440000">-10 HP</button>
-                            <button onclick="mudarVida(${i}, 10)" style="flex:1; padding:8px; margin:0; font-size:0.9rem; background:#1b4332">+10 HP</button>
-                        </div>
-                        <textarea placeholder="Inventário e Itens..." style="margin-top:10px; height:70px; font-size:0.75rem; border-color:#333"></textarea>
                     </div>`;
             });
         }
 
-        function mudarVida(idx, valor) {
-            let p = finalOrder[idx];
-            p.hp = Math.max(0, Math.min(p.maxHp, p.hp + valor));
-            const pct = (p.hp / p.maxHp) * 100;
-            document.getElementById(`bar-fill-${idx}`).style.width = pct + "%";
-            document.getElementById(`num-hp-${idx}`).innerText = `${p.hp}/${p.maxHp}`;
-            
-            // Cor dinâmica da barra
-            const fill = document.getElementById(`bar-fill-${idx}`);
-            if(pct < 30) fill.style.background = "#d90429";
-            else if(pct < 60) fill.style.background = "#ffb703";
-            else fill.style.background = "#38b000";
+        function mudarVida(idx, v) {
+            players[idx].hp = Math.max(0, Math.min(players[idx].maxHp, players[idx].hp + v));
+            const pct = (players[idx].hp / players[idx].maxHp) * 100;
+            document.getElementById(`fill-${idx}`).style.width = pct + "%";
+            document.getElementById(`val-hp-${idx}`).innerText = `${players[idx].hp}/${players[idx].maxHp}`;
+        }
+
+        function enviarMensagem() {
+            const input = document.getElementById('chat-input');
+            if(!input.value) return;
+            database.ref('chat').push({ user: "Mestre", text: input.value });
+            input.value = '';
         }
 
         function jogarDado() {
-            const lados = document.getElementById('dado-seletor').value;
-            const resDisplay = document.getElementById('dice-result');
-            resDisplay.innerText = "...";
-            setTimeout(() => {
-                const res = Math.floor(Math.random() * lados) + 1;
-                resDisplay.innerText = res;
-            }, 300);
+            const d = document.getElementById('dado-seletor').value;
+            const res = Math.floor(Math.random() * d) + 1;
+            document.getElementById('dice-result').innerText = res;
+            database.ref('chat').push({ user: "DADO", text: `Rolou D${d} e tirou: ${res}` });
+        }
+
+        function ouvirChat() {
+            database.ref('chat').limitToLast(15).on('child_added', (snap) => {
+                const m = snap.val();
+                const box = document.getElementById('chat-box');
+                box.innerHTML += `<div class="msg"><b style="color:var(--red)">${m.user}:</b> ${m.text}</div>`;
+                box.scrollTop = box.scrollHeight;
+            });
         }
     </script>
 </body>
