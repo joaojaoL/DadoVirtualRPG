@@ -3,226 +3,189 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RPG Master - Dashboard v3</title>
-    <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Special+Elite&family=Oswald:wght@700&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <title>RPG Master Gold Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Special+Elite&family=Oswald:wght@700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary-red: #d90429;
-            --bg-dark: #0b090a;
-            --card-bg: #161a1d;
-            --text-white: #f5f3f4;
-        }
-
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: var(--bg-dark);
-            color: var(--text-white);
-            margin: 0; padding: 0;
-            display: flex; flex-direction: column; align-items: center;
-        }
-
-        .header-rpg {
-            background-color: var(--primary-red);
-            width: 100%; padding: 20px 0; text-align: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-        }
-
-        .header-rpg h1 { margin: 0; color: white; font-family: 'Oswald'; text-transform: uppercase; }
-
-        .setup-screen {
-            max-width: 650px; width: 90%; background: var(--card-bg);
-            padding: 30px; border-radius: 10px; border-top: 5px solid var(--primary-red);
-            text-align: center; margin: 20px auto; box-shadow: 0 10px 30px rgba(0,0,0,0.7);
-        }
-
-        select, input, button, textarea {
-            padding: 12px; margin: 8px 5px; border-radius: 5px; border: 1px solid #444;
-            font-size: 1rem; background: #0b090a; color: white; width: 85%;
-        }
+        :root { --primary-red: #d90429; --bg-dark: #0b090a; --card-bg: #161a1d; --text-white: #f5f3f4; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-dark); color: var(--text-white); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; }
         
-        button { background: var(--primary-red); border: none; font-weight: bold; cursor: pointer; transition: 0.3s; width: auto !important; padding: 12px 25px !important;}
-        button:hover { background: #ef233c; transform: scale(1.05); }
+        /* CABEÇALHO ESTILO IMAGEM */
+        .header-rpg { background-color: var(--primary-red); width: 100%; padding: 25px 0; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.6); }
+        .header-rpg h1 { margin: 0; color: white; font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 2px; }
 
-        .player-entry {
-            background: #222; padding: 15px; margin-bottom: 10px; border-radius: 8px; border-left: 4px solid var(--primary-red);
-        }
+        .container { max-width: 700px; width: 90%; background: var(--card-bg); padding: 30px; border-radius: 12px; border-top: 6px solid var(--primary-red); margin: 30px auto; box-shadow: 0 15px 35px rgba(0,0,0,0.8); text-align: center; }
+        
+        label { display: block; margin-top: 15px; font-weight: bold; color: #ef233c; text-align: left; }
+        select, input, button, textarea { padding: 12px; margin: 10px 0; border-radius: 6px; border: 1px solid #444; font-size: 1rem; background: #0b090a; color: white; width: 100%; box-sizing: border-box; }
+        
+        button { background: var(--primary-red); border: none; font-weight: bold; cursor: pointer; transition: 0.2s; text-transform: uppercase; }
+        button:hover { background: #ef233c; transform: translateY(-2px); }
+        button:active { transform: translateY(0); }
 
-        /* BARRINHAS DE VIDA */
-        .player-status-card {
-            background: #1a1a1a; border: 2px solid #333; margin: 10px 0; padding: 15px; border-radius: 8px;
-        }
-        .hp-container { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
-        .hp-bar-bg { flex-grow: 1; height: 18px; background: #333; border: 1px solid #000; overflow: hidden; }
-        .hp-bar-fill { height: 100%; background: #ff0000; width: 100%; transition: width 0.4s ease; }
-        .hp-heart { width: 22px; height: 22px; object-fit: cover; object-position: left; }
+        .player-box { background: #252525; padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 5px solid var(--primary-red); display: flex; gap: 10px; flex-wrap: wrap; }
+        .player-box input { width: 48%; }
+        .player-box select { width: 48%; }
 
-        /* PAINEL */
+        /* PAINEL FINAL */
         #rpg-panel { display: none; width: 95%; max-width: 1200px; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; padding: 20px; }
-        .card { background: var(--card-bg); padding: 20px; border-radius: 8px; border: 1px solid #333; text-align: center; }
-        
-        .dice-main-area { position: relative; width: 160px; height: 160px; margin: 10px auto; }
-        #dice-image { width: 100%; height: 100%; object-fit: contain; }
-        #dice-result { position: absolute; top: 52%; left: 50%; transform: translate(-50%, -50%); font-size: 2.2rem; font-family: 'MedievalSharp'; font-weight: bold; text-shadow: 2px 2px 4px #000; }
-        
+        .card { background: var(--card-bg); padding: 20px; border-radius: 10px; border: 1px solid #333; position: relative; }
+
+        /* BARRINHAS */
+        .hp-unit { background: #111; padding: 12px; border-radius: 8px; margin-bottom: 15px; }
+        .hp-meta { display: flex; justify-content: space-between; margin-bottom: 5px; font-family: 'MedievalSharp'; }
+        .hp-bar-outer { height: 20px; background: #333; border: 2px solid #000; border-radius: 4px; overflow: hidden; display: flex; align-items: center; }
+        .hp-bar-inner { height: 100%; width: 100%; background: #38b000; transition: 0.5s width ease-in-out; }
+        .heart-icon { width: 20px; margin-right: 8px; image-rendering: pixelated; }
+
+        /* DADO */
+        .dice-zone { position: relative; width: 160px; height: 160px; margin: 20px auto; }
+        .dice-zone img { width: 100%; height: 100%; object-fit: contain; }
+        #res-dado { position: absolute; top: 52%; left: 50%; transform: translate(-50%, -50%); font-size: 2.5rem; font-weight: bold; font-family: 'MedievalSharp'; text-shadow: 2px 2px 5px #000; }
+
         .shake { animation: shake 0.4s; }
-        @keyframes shake { 0%, 100% {transform: translate(0,0);} 25% {transform: translate(-4px,4px);} 75% {transform: translate(4px,-4px);} }
+        @keyframes shake { 0%, 100% {transform: rotate(0);} 25% {transform: rotate(5deg);} 75% {transform: rotate(-5deg);} }
     </style>
 </head>
 <body>
 
     <div class="header-rpg">
-        <h1 id="main-title">Gerador de Dados & Mestre</h1>
+        <h1 id="site-title">Gerador de Dados & RPG Online</h1>
     </div>
 
-    <div id="setup-screen" class="setup-screen">
-        <h2>Configurar Mundo</h2>
-        <label>Estilo do RPG:</label>
-        <select id="rpg-style">
+    <div id="step-1" class="container">
+        <h2>Configurar Sessão</h2>
+        <label>Estilo do RPG</label>
+        <select id="style-sel">
             <option value="jujutsu">Jujutsu Kaisen</option>
-            <option value="medieval">Medieval Clássico</option>
-            <option value="slasher">Slasher (Terror Filme)</option>
+            <option value="medieval">Medieval</option>
+            <option value="slasher">Slasher (Terror)</option>
             <option value="anime">Anime Shonen</option>
             <option value="ficcao">Ficção Científica</option>
             <option value="roça">Aventuras na Roça</option>
         </select>
 
         <label>One Shot?</label>
-        <select id="is-oneshot">
+        <select id="oneshot-sel">
             <option value="sim">Sim</option>
             <option value="nao">Não</option>
         </select>
 
-        <label>Duração (1 a 5 meses):</label>
-        <input type="number" id="campaign-duration" min="1" max="5" value="1">
+        <label>Duração da Campanha</label>
+        <select id="duration-sel">
+            <option value="1 dia">1 Dia</option>
+            <option value="1 semana">1 Semana</option>
+            <option value="1 mes">1 Mês</option>
+            <option value="2 meses">2 Meses</option>
+            <option value="3 meses">3 Meses</option>
+            <option value="4 meses">4 Meses</option>
+            <option value="5 meses">5 Meses</option>
+        </select>
 
-        <label>Jogadores:</label>
-        <input type="number" id="player-count" min="1" value="3">
+        <label>Nº de Jogadores</label>
+        <input type="number" id="num-players" value="3" min="1">
 
-        <label>HP Inicial:</label>
-        <input type="number" id="initial-hp" value="100">
+        <label>Vida (HP) Inicial</label>
+        <input type="number" id="hp-init" value="100">
 
-        <button onclick="goToNames()">Configurar Jogadores</button>
+        <button onclick="irParaNomes()">Configurar Jogadores</button>
     </div>
 
-    <div id="name-screen" class="setup-screen" style="display:none;">
-        <h2 id="theme-subtitle">Fichas Rápidas</h2>
-        <div id="name-inputs"></div>
-        <button onclick="startInitiative()">Confirmar Personagens</button>
-        
-        <div id="init-area" style="display:none; margin-top:20px;">
-            <h3>Ordem de Turno</h3>
-            <div id="init-winner" style="font-size: 1.5rem; color: var(--primary-red); font-family: 'MedievalSharp'; margin-bottom: 10px;">?</div>
-            <button id="btn-spin" onclick="spinInitiative()">Sortear Próximo</button>
+    <div id="step-2" class="container" style="display:none;">
+        <h2>Fichas dos Heróis</h2>
+        <div id="list-inputs"></div>
+        <button id="btn-confirma" onclick="confirmarGrupo()">Confirmar Grupo</button>
+
+        <div id="area-sorteio" style="display:none; margin-top:20px; border-top: 2px dashed #444; padding-top:20px;">
+            <div id="display-sorteado" style="font-size: 1.4rem; color: #ffb703; margin-bottom: 15px;">Aguardando Sorteio...</div>
+            <button id="btn-rodar" onclick="rodarIniciativa()">Sortear Próximo da Ordem</button>
         </div>
     </div>
 
     <div id="rpg-panel">
         <div class="card">
-            <h3>👥 Status do Grupo</h3>
-            <div id="player-hp-list"></div>
+            <h3>👤 Status do Grupo</h3>
+            <div id="painel-hp"></div>
         </div>
 
         <div class="card">
             <h3>🎲 Dados</h3>
-            <select id="dice-selector">
-                <option value="20">D20</option>
-                <option value="6">D6</option>
-                <option value="10">D10</option>
-                <option value="100">D100</option>
+            <select id="dado-tipo">
+                <option value="20">D20 (Vinte Lados)</option>
+                <option value="6">D6 (Cubo)</option>
+                <option value="10">D10 (Dez Lados)</option>
+                <option value="100">D100 (Porcentagem)</option>
             </select>
-            <div class="dice-main-area" id="dice-container">
-                <img src="dado-20-lados.png" id="dice-image">
-                <div id="dice-result">--</div>
+            <div class="dice-zone" id="dice-box">
+                <img src="dado-20-lados.png">
+                <div id="res-dado">--</div>
             </div>
-            <button onclick="rollDice()">LANÇAR</button>
+            <button onclick="lancarDado()">LANÇAR DADO</button>
         </div>
 
         <div class="card">
-            <h3>✨ Oráculo de Habilidades</h3>
-            <div id="power-result" style="background:#000; padding:15px; border-radius:5px; margin-bottom:10px; min-height:60px;">...</div>
-            <button onclick="generatePower()">Gerar Poder Aleatório</button>
+            <h3>✨ Oráculo</h3>
+            <div id="ora-res" style="background:#000; padding:15px; border-radius:5px; min-height:60px; font-style:italic; margin-bottom:10px;">O destino aguarda...</div>
+            <button onclick="gerarPoder()" style="background:#7209b7">Gerar Habilidade</button>
         </div>
     </div>
 
     <script>
-        const classData = {
+        const classesDb = {
             jujutsu: ["Maldição", "Humano", "Feiticeiro", "Caçador de Feiticeiro", "Receptáculo"],
-            medieval: ["Guerreiro", "Mago", "Ladino", "Clérigo", "Paladino", "Arqueiro", "Bárbaro", "Bardo", "Druida", "Monge", "Feiticeiro", "Necromante", "Alquimista", "Cavaleiro", "Samurai", "Assassino"],
-            slasher: ["Sobrevivente", "Final Girl", "Jock (Atleta)", "Nerd", "Cético", "Policial", "Coveiro", "Monitor de Acampamento", "Repórter", "O Palhaço", "Gótico", "Médico", "Motorista", "Vidente", "Sheriff", "Andarilho"],
-            anime: ["Protagonista Shonen", "Rival", "Sensei", "Usuário de Energia", "Espadachim", "Mecha Pilot", "Cyborg", "Alienígena", "Ninja", "Shinigami", "Garota Mágica", "Mestre de Monstros", "Viajante do Tempo", "Deus", "Demônio", "Anti-Herói"],
-            ficcao: ["Piloto Estelar", "Engenheiro Espacial", "Hacker", "Soldado Imperial", "Mercenário Galático", "Andróide", "Alien Diplomata", "Explorador de Ruínas", "Cientista Louco", "Médico de Campo", "Caçador de Recompensas", "Oficial de Frota", "Sniper Laser", "Psion", "Sabotador", "Drone Master"],
-            roça: ["Fazendeiro", "Peão de Trecho", "Violeiro", "Benzedeira", "Caçador de Tatu", "Dono de Venda", "Agrônomo", "Lenhador", "Veterinário", "Andarilho da Mata", "Vaqueiro", "Pescador", "Capataz", "Romeiro", "Caminhoneiro", "Mateiro"]
+            medieval: ["Guerreiro", "Mago", "Ladino", "Clérigo", "Paladino", "Arqueiro", "Bárbaro", "Bardo", "Druida", "Monge", "Necromante", "Alquimista", "Cavaleiro", "Samurai", "Assassino", "Pirata"],
+            slasher: ["Sobrevivente", "Final Girl", "Atleta", "Nerd", "Cético", "Policial", "Coveiro", "Monitor", "Repórter", "Palhaço", "Gótico", "Médico", "Motorista", "Vidente", "Sheriff", "Zelador"],
+            roça: ["Fazendeiro", "Peão", "Violeiro", "Benzedeira", "Caçador de Tatu", "Dono de Venda", "Agrônomo", "Lenhador", "Veterinário", "Mateiro", "Vaqueiro", "Pescador", "Capataz", "Romeiro", "Caminhoneiro", "Boiadeiro"]
         };
 
-        let players = [];
-        let remainingInit = [];
-        let finalOrder = [];
-        let baseHP = 100;
+        let db_jogadores = [];
+        let sorteio_lista = [];
+        let ordem_final = [];
+        let hp_global = 100;
 
-        function goToNames() {
-            const style = document.getElementById('rpg-style').value;
-            const count = parseInt(document.getElementById('player-count').value);
-            baseHP = parseInt(document.getElementById('initial-hp').value);
+        function irParaNomes() {
+            const estilo = document.getElementById('style-sel').value;
+            const qtd = parseInt(document.getElementById('num-players').value);
+            hp_global = parseInt(document.getElementById('hp-init').value) || 100;
             
-            const container = document.getElementById('name-inputs');
-            container.innerHTML = '';
+            const area = document.getElementById('list-inputs');
+            area.innerHTML = '';
             
-            const classes = classData[style] || classData.medieval;
+            const classes = classesDb[estilo] || classesDb.medieval;
 
-            for(let i=1; i<=count; i++) {
+            for(let i=0; i<qtd; i++) {
                 let options = classes.map(c => `<option value="${c}">${c}</option>`).join('');
-                container.innerHTML += `
-                    <div class="player-entry">
-                        <input type="text" placeholder="Nome do Personagem ${i}" class="p-name" style="width:45%">
-                        <select class="p-class" style="width:45%">${options}</select>
+                area.innerHTML += `
+                    <div class="player-box">
+                        <input type="text" placeholder="Nome do Jogador ${i+1}" class="in-nome">
+                        <select class="in-classe">${options}</select>
                     </div>`;
             }
-            document.getElementById('setup-screen').style.display = 'none';
-            document.getElementById('name-screen').style.display = 'block';
-        }
-
-        function startInitiative() {
-            const names = document.querySelectorAll('.p-name');
-            const classes = document.querySelectorAll('.p-class');
-            players = [];
-            names.forEach((n, i) => {
-                players.push({ name: n.value || "Herói", className: classes[i].value, hp: baseHP });
-            });
-            remainingInit = [...players];
-            document.getElementById('init-area').style.display = 'block';
-        }
-
-        function spinInitiative() {
-            if(remainingInit.length === 0) return;
-            const res = document.getElementById('init-winner');
-            const idx = Math.floor(Math.random() * remainingInit.length);
-            const chosen = remainingInit.splice(idx, 1)[0];
-            finalOrder.push(chosen);
-            res.innerText = `Sorteado: ${chosen.name}`;
             
-            if(remainingInit.length === 0) {
-                const btn = document.getElementById('btn-spin');
-                btn.innerText = "ABRIR PAINEL DO MESTRE";
-                btn.onclick = () => {
-                    document.getElementById('name-screen').style.display = 'none';
-                    document.getElementById('rpg-panel').style.display = 'grid';
-                    renderPanel();
-                };
-            }
+            document.getElementById('step-1').style.display = 'none';
+            document.getElementById('step-2').style.display = 'block';
         }
 
-        function renderPanel() {
-            const list = document.getElementById('player-hp-list');
-            list.innerHTML = '';
-            finalOrder.forEach((p, i) => {
-                list.innerHTML += `
-                    <div class="player-status-card">
-                        <strong>${p.name} (${p.className})</strong>
-                        <div class="hp-container">
-                            <img src="as.jpg" class="hp-heart">
-                            <div class="hp-bar-bg"><div id="bar-${i}" class="hp-bar-fill"></div></div>
-                            <span id="txt-${i}">${p.hp}</span>
-                        </div>
-                        <button onclick="updateHP(${i}, -10)">-10</button>
-                        <button onclick="updateHP(${i}, 10)" style="background:green">+10</button>
-                    </div>`;
+        function confirmarGrupo() {
+            const nomes = document.querySelectorAll('.in-nome');
+            const classes = document.querySelectorAll('.in-classe');
+            db_jogadores = [];
+
+            nomes.forEach((n, i) => {
+                db_jogadores.push({
+                    nome: n.value || `Herói ${i+1}`,
+                    classe: classes[i].value,
+                    hp: hp_global
+                });
+            });
+
+            sorteio_lista = [...db_jogadores];
+            document.getElementById('btn-confirma').style.display = 'none';
+            document.getElementById('area-sorteio').style.display = 'block';
+        }
+
+        function rodarIniciativa() {
+            if(sorteio_lista.length === 0) return;
+
+            const display = document.getElementById('display-sorteado');
+            const idx = Math.floor(Math.random() * sorteio_lista.length);
+            const escolhido = sorteio_lista.splice(idx,
