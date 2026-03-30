@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RPG Master - Setup de Iniciativa</title>
+    <title>RPG Master - Painel Completo</title>
     <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -12,6 +12,7 @@
             --accent: #bc13fe;
             --gold: #ffb703;
             --text: #ffffff;
+            --green: #38b000;
         }
 
         body {
@@ -31,15 +32,15 @@
             box-shadow: 0 0 20px rgba(188, 19, 254, 0.3);
         }
 
-        h1, h2 { font-family: 'MedievalSharp'; color: var(--gold); }
+        h1, h2, h3 { font-family: 'MedievalSharp'; color: var(--gold); }
 
-        input, button {
+        input, button, textarea {
             padding: 12px; margin: 5px;
             border-radius: 8px; border: none;
             font-size: 1rem;
         }
 
-        input { background: #2a2a35; color: white; border: 1px solid #444; width: 80%; }
+        input, textarea { background: #2a2a35; color: white; border: 1px solid #444; width: 85%; }
         
         button { 
             background: var(--accent); color: white; 
@@ -47,158 +48,79 @@
         }
         
         button:hover { transform: scale(1.05); filter: brightness(1.2); }
-        button:disabled { background: #444; cursor: not-allowed; }
 
         /* ROLETA ESTILIZADA */
-        #wheel-box {
-            position: relative; width: 200px; height: 200px;
-            margin: 20px auto; border-radius: 50%;
-            border: 8px solid var(--gold);
+        .wheel-wrap {
+            position: relative; width: 180px; height: 180px;
+            margin: 15px auto; border-radius: 50%;
+            border: 6px solid var(--gold);
             display: flex; align-items: center; justify-content: center;
-            background: conic-gradient(from 0deg, #1a1a20, #333, #1a1a20);
-            transition: transform 2.5s cubic-bezier(0.1, 0, 0.2, 1);
+            background: radial-gradient(circle, #333, #1a1a20);
+            transition: transform 3s cubic-bezier(0.1, 0, 0.2, 1);
         }
 
-        #wheel-box::after {
-            content: '▼'; position: absolute; top: -25px; 
-            color: var(--gold); font-size: 25px;
+        .wheel-wrap::after {
+            content: '▼'; position: absolute; top: -20px; 
+            color: var(--gold); font-size: 20px; left: 50%; transform: translateX(-50%);
         }
 
-        /* PAINEL PRINCIPAL (ESCONDIDO NO INÍCIO) */
+        /* PAINEL PRINCIPAL */
         #rpg-panel {
-            display: none; width: 100%; max-width: 1000px;
-            grid-template-columns: 1fr 1fr; gap: 20px;
+            display: none; width: 100%; max-width: 1100px;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;
         }
 
-        .card { background: var(--card); padding: 20px; border-radius: 10px; border: 1px solid #333; }
-        .order-item { color: #4cc9f0; font-weight: bold; padding: 5px; border-bottom: 1px solid #333; }
+        .card { background: var(--card); padding: 20px; border-radius: 10px; border: 1px solid #333; text-align: center; }
+        
+        /* DADO */
+        .dice-container {
+            position: relative; width: 150px; height: 150px;
+            margin: 0 auto 15px; display: flex; align-items: center; justify-content: center;
+        }
+
+        #dice-image { width: 100%; height: 100%; object-fit: contain; }
+
+        #dice-result {
+            position: absolute; top: 52%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2rem; font-family: 'MedievalSharp';
+            color: #fff; text-shadow: 2px 2px 4px #000; pointer-events: none;
+        }
+
+        .shake { animation: shake 0.4s ease-in-out; }
+        @keyframes shake {
+            0% { transform: translate(2px, 1px); }
+            50% { transform: translate(-3px, 2px); }
+            100% { transform: translate(0,0); }
+        }
+
+        .order-item { color: #4cc9f0; font-weight: bold; padding: 8px; border-bottom: 1px solid #333; text-align: left;}
     </style>
 </head>
 <body>
 
     <div id="setup-step-1" class="setup-screen">
-        <h1>⚔️ Iniciar Sessão</h1>
-        <p>Quantos heróis (ou vilões) participarão?</p>
-        <input type="number" id="player-count" min="1" placeholder="Ex: 4">
+        <h1>⚔️ Preparar Mesa</h1>
+        <p>Quantos jogadores?</p>
+        <input type="number" id="player-count" min="1" value="3">
         <button onclick="goToNames()">Próximo</button>
     </div>
 
     <div id="setup-step-2" class="setup-screen" style="display:none;">
-        <h2>Quem são eles?</h2>
+        <h2>Nomes dos Heróis</h2>
         <div id="name-inputs"></div>
-        <button onclick="prepareWheel()" style="background: #38b000;">Confirmar Nomes</button>
+        <button onclick="prepareWheel()" style="background: var(--green);">Confirmar Grupo</button>
         
         <div id="roulette-area" style="display:none;">
-            <hr style="margin: 20px 0; border: 0.5px solid #444;">
-            <div id="wheel-box"><div id="winner-text" style="font-family: 'MedievalSharp';">?</div></div>
-            <p id="status-msg">Sorteie a ordem de iniciativa!</p>
-            <button id="spin-btn" onclick="spinPlayer()">Girar para Ordem</button>
+            <div class="wheel-wrap" id="init-wheel"><div id="winner-text" style="font-family: 'MedievalSharp';">?</div></div>
+            <p id="status-msg"></p>
+            <button id="spin-btn" onclick="spinPlayer()">Sortear Próxima Iniciativa</button>
         </div>
     </div>
 
     <div id="rpg-panel">
+        
         <div class="card">
-            <h2>📜 Ordem do Turno</h2>
+            <h2>📜 Turnos</h2>
             <div id="final-order-list"></div>
-            <button onclick="location.reload()" style="background:#444; margin-top: 20px; font-size: 0.7rem;">Nova Sessão</button>
-        </div>
-
-        <div class="card">
-            <h2>🎲 Dados Arcanos</h2>
-            <div id="dice-result" style="font-size: 4rem; color: var(--gold); text-align: center;">--</div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                <button onclick="roll(4)">D4</button>
-                <button onclick="roll(6)">D6</button>
-                <button onclick="roll(10)">D10</button>
-                <button onclick="roll(20)">D20</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        let playerList = [];
-        let remainingToSpin = [];
-        let finalOrder = [];
-        let rotation = 0;
-
-        // Vai para a tela de nomes
-        function goToNames() {
-            const count = document.getElementById('player-count').value;
-            if(count < 1) return alert("Mestre, preciso de pelo menos 1 jogador!");
-            
-            const container = document.getElementById('name-inputs');
-            container.innerHTML = '';
-            for(let i=1; i<=count; i++) {
-                container.innerHTML += `<input type="text" placeholder="Nome do Jogador ${i}" class="p-name-input"><br>`;
-            }
-            document.getElementById('setup-step-1').style.display = 'none';
-            document.getElementById('setup-step-2').style.display = 'block';
-        }
-
-        // Prepara a roleta
-        function prepareWheel() {
-            const inputs = document.querySelectorAll('.p-name-input');
-            playerList = Array.from(inputs).map(i => i.value.trim() || "Herói Anônimo");
-            remainingToSpin = [...playerList];
-            
-            document.getElementById('name-inputs').style.display = 'none';
-            document.querySelector('#setup-step-2 button').style.display = 'none';
-            document.getElementById('roulette-area').style.display = 'block';
-            updateStatus();
-        }
-
-        // Gira a roleta e remove o jogador da vez
-        function spinPlayer() {
-            if(remainingToSpin.length === 0) return;
-
-            const btn = document.getElementById('spin-btn');
-            const wheel = document.getElementById('wheel-box');
-            const winnerDisplay = document.getElementById('winner-text');
-            
-            btn.disabled = true;
-            rotation += 1080 + Math.floor(Math.random() * 360);
-            wheel.style.transform = `rotate(${rotation}deg)`;
-            winnerDisplay.innerText = "???";
-
-            setTimeout(() => {
-                const randomIndex = Math.floor(Math.random() * remainingToSpin.length);
-                const winner = remainingToSpin.splice(randomIndex, 1)[0];
-                
-                finalOrder.push(winner);
-                winnerDisplay.innerText = winner;
-                
-                updateStatus();
-                btn.disabled = false;
-
-                // Se todos foram sorteados, abre o jogo!
-                if(remainingToSpin.length === 0) {
-                    btn.innerText = "ENTRAR NO JOGO";
-                    btn.onclick = enterGame;
-                    btn.style.background = "#38b000";
-                }
-            }, 2500);
-        }
-
-        function updateStatus() {
-            document.getElementById('status-msg').innerText = `Faltam sortear: ${remainingToSpin.length} jogadores`;
-        }
-
-        // Abre o painel principal
-        function enterGame() {
-            document.getElementById('setup-step-2').style.display = 'none';
-            document.getElementById('rpg-panel').style.display = 'grid';
-            
-            const listDiv = document.getElementById('final-order-list');
-            finalOrder.forEach((name, index) => {
-                listDiv.innerHTML += `<div class="order-item">${index + 1}º - ${name}</div>`;
-            });
-        }
-
-        // Dados
-        function roll(s) {
-            const res = Math.floor(Math.random() * s) + 1;
-            document.getElementById('dice-result').innerText = res;
-        }
-    </script>
-</body>
-</html>
+            <button onclick="location.reload()" style="background:#444; margin-top: 20px; width: 80%; font-
