@@ -184,12 +184,12 @@
             <button onclick="toggleCalc()" style="background:#222; border:1px solid var(--red); margin-bottom:20px;">🧮 ABRIR CALCULADORA</button>
 
             <label>SELECIONAR DADO</label>
-            <select id="dado-seletor">
+            <select id="dado-seletor" onchange="atualizarImagemDado()">
                 <option value="2">D2</option>
                 <option value="4">D4</option>
                 <option value="6">D6</option>
                 <option value="8">D8</option>
-                <option value="15">D15</option>
+                <option value="9">D9</option>
                 <option value="20" selected>D20</option>
             </select>
             <div id="dice-result" class="dice-box">--</div>
@@ -332,6 +332,24 @@
             salvarProgresso();
         }
 
+        function atualizarImagemDado() {
+            const lados = document.getElementById('dado-seletor').value;
+            const resDisplay = document.getElementById('dice-result');
+            
+            if (lados === "9") {
+                resDisplay.style.backgroundImage = "url('dado9.png')";
+            } else if (lados === "2" || lados === "4") {
+                // Tanto D2 quanto D4 usam a mesma imagem dado2.png
+                resDisplay.style.backgroundImage = "url('dado2.png')";
+            } else if (lados === "8" || lados === "6") {
+                // Tanto D8 quanto D6 usam a mesma imagem dado8.png
+                resDisplay.style.backgroundImage = "url('dado8.png')";
+            } else {
+                // Imagem padrão para D20
+                resDisplay.style.backgroundImage = "url('dado.png')";
+            }
+        }
+
         function jogarDado() {
             const lados = document.getElementById('dado-seletor').value;
             const resDisplay = document.getElementById('dice-result');
@@ -358,7 +376,6 @@
             }
         }
 
-        // --- SISTEMA DE SAVE ---
         function salvarProgresso() {
             const dadosSessao = {
                 finalOrder: finalOrder,
@@ -380,6 +397,7 @@
                     carregarPainel();
                 }
             }
+            atualizarImagemDado();
         }
 
         function reiniciarTudo() {
