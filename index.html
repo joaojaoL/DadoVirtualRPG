@@ -78,7 +78,6 @@
         .hp-bar-bg { height: 30px; background: #222; border: 2px solid #000; position: relative; margin: 10px 0; }
         .hp-bar-fill { height: 100%; background: var(--red); width: 100%; transition: 0.4s ease; }
 
-        /* ESTILO DO DADO COM A SUA IMAGEM */
         .dice-box { 
             width: 160px; height: 160px; 
             background-image: url('dado.png'); 
@@ -96,7 +95,6 @@
             transition: transform 0.1s;
         }
 
-        /* Animação de tremor ao rolar */
         .shake { animation: shakeAnim 0.3s infinite; }
         @keyframes shakeAnim {
             0% { transform: translate(1px, 1px) rotate(0deg); }
@@ -108,6 +106,31 @@
         }
         
         .notes-area { grid-column: 1 / -1; background: #000; border: 2px dashed var(--red); padding: 20px; margin-top: 25px; }
+
+        /* ESTILO DA CALCULADORA POPUP */
+        #calc-popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #111;
+            border: 3px solid var(--red);
+            padding: 20px;
+            z-index: 1000;
+            box-shadow: 10px 10px 0px #000;
+        }
+        .calc-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+        }
+        .calc-btn {
+            padding: 15px;
+            font-size: 1rem;
+            margin: 0;
+            background: #222;
+        }
     </style>
 </head>
 <body>
@@ -157,6 +180,9 @@
 
         <div class="card">
             <h3>[DADOS E FERRAMENTAS]</h3>
+            
+            <button onclick="toggleCalc()" style="background:#222; border:1px solid var(--red); margin-bottom:20px;">🧮 ABRIR CALCULADORA</button>
+
             <label>SELECIONAR DADO</label>
             <select id="dado-seletor">
                 <option value="2">D2</option>
@@ -173,6 +199,32 @@
                 <label style="margin:0">NOTAS DA AVENTURA</label>
                 <textarea id="master-notes" rows="8" placeholder="Digite aqui o resumo da história..."></textarea>
             </div>
+        </div>
+    </div>
+
+    <div id="calc-popup">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px">
+            <span style="color:var(--red); font-weight:bold">CALCULADORA</span>
+            <button onclick="toggleCalc()" style="width:30px; padding:5px; margin:0; background:#444">X</button>
+        </div>
+        <input type="text" id="calc-display" readonly style="text-align:right; margin-bottom:10px; font-size:1.2rem">
+        <div class="calc-grid">
+            <button class="calc-btn" onclick="calcClear()">C</button>
+            <button class="calc-btn" onclick="calcInput('/')">/</button>
+            <button class="calc-btn" onclick="calcInput('*')">x</button>
+            <button class="calc-btn" onclick="calcInput('-')">-</button>
+            <button class="calc-btn" onclick="calcInput('7')">7</button>
+            <button class="calc-btn" onclick="calcInput('8')">8</button>
+            <button class="calc-btn" onclick="calcInput('9')">9</button>
+            <button class="calc-btn" onclick="calcInput('+')">+</button>
+            <button class="calc-btn" onclick="calcInput('4')">4</button>
+            <button class="calc-btn" onclick="calcInput('5')">5</button>
+            <button class="calc-btn" onclick="calcInput('6')">6</button>
+            <button class="calc-btn" onclick="calcEqual()">=</button>
+            <button class="calc-btn" onclick="calcInput('1')">1</button>
+            <button class="calc-btn" onclick="calcInput('2')">2</button>
+            <button class="calc-btn" onclick="calcInput('3')">3</button>
+            <button class="calc-btn" onclick="calcInput('0')">0</button>
         </div>
     </div>
 
@@ -273,15 +325,28 @@
         function jogarDado() {
             const lados = document.getElementById('dado-seletor').value;
             const resDisplay = document.getElementById('dice-result');
-            
             resDisplay.innerText = "...";
             resDisplay.classList.add('shake');
-            
             setTimeout(() => {
                 const res = Math.floor(Math.random() * lados) + 1;
                 resDisplay.classList.remove('shake');
                 resDisplay.innerText = res;
             }, 500);
+        }
+
+        // FUNÇÕES DA CALCULADORA
+        function toggleCalc() {
+            const pop = document.getElementById('calc-popup');
+            pop.style.display = (pop.style.display === 'block') ? 'none' : 'block';
+        }
+        function calcInput(v) { document.getElementById('calc-display').value += v; }
+        function calcClear() { document.getElementById('calc-display').value = ''; }
+        function calcEqual() {
+            try {
+                document.getElementById('calc-display').value = eval(document.getElementById('calc-display').value);
+            } catch(e) {
+                document.getElementById('calc-display').value = 'Erro';
+            }
         }
     </script>
 </body>
