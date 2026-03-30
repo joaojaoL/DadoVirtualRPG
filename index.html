@@ -3,101 +3,137 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RPG MASTER - TACTICAL SYSTEM</title>
-    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <title>RPG MASTER - ULTIMATE TACTICAL</title>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <style>
-        :root { --red: #d90429; --dark: #0b090a; --card: #161a1d; --white: #f5f3f4; --border: #444; }
+        :root { --red: #d90429; --dark: #0b090a; --card: #161a1d; --white: #f5f3f4; --border: #ef233c; }
         * { border-radius: 0 !important; box-sizing: border-box; }
         body { font-family: 'Roboto Mono', monospace; background: var(--dark); color: var(--white); margin: 0; padding-bottom: 50px; }
-        .header { background: var(--red); padding: 15px; text-align: center; border-bottom: 5px solid #000; margin-bottom: 20px; }
-        .header h1 { margin: 0; font-family: 'Oswald'; text-transform: uppercase; font-size: 1.5rem; }
-        .container { max-width: 800px; width: 95%; background: var(--card); padding: 25px; border: 3px solid var(--red); margin: 20px auto; box-shadow: 10px 10px 0px #000; }
-        h2, h3 { font-family: 'Oswald'; text-transform: uppercase; border-bottom: 2px solid var(--red); padding-bottom: 5px; margin-bottom: 15px; }
-        label { display: block; margin-top: 10px; font-weight: bold; color: var(--red); font-size: 0.75rem; text-transform: uppercase; }
-        select, input, textarea { padding: 10px; margin: 5px 0; border: 2px solid var(--border); background: #000; color: #fff; width: 100%; font-family: 'Roboto Mono'; outline: none; }
-        button { background: var(--red); color: white; border: none; padding: 12px; width: 100%; font-family: 'Oswald'; font-size: 1.1rem; text-transform: uppercase; cursor: pointer; margin-top: 10px; box-shadow: 4px 4px 0px #000; }
-        button:hover { background: #ef233c; transform: translate(-1px, -1px); }
         
-        .ficha-input-box { border: 2px solid #555; background: #000; padding: 15px; margin-bottom: 25px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .full-width { grid-column: span 2; }
+        /* HEADER E DECORAÇÃO */
+        .header { background: var(--red); padding: 20px; text-align: center; border-bottom: 8px solid #000; position: relative; }
+        .header h1 { margin: 0; font-family: 'Oswald'; text-transform: uppercase; letter-spacing: 2px; text-shadow: 3px 3px 0px #000; }
         
-        #rpg-panel { display: none; width: 98%; max-width: 1400px; margin: 0 auto; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 15px; }
-        .card { background: var(--card); padding: 20px; border: 2px solid var(--red); }
-        .hp-bar-bg { height: 25px; background: #222; border: 1px solid #000; margin: 8px 0; overflow: hidden; }
-        .hp-bar-fill { height: 100%; background: var(--red); width: 100%; transition: 0.4s; }
-        #chat-box { height: 350px; overflow-y: auto; background: #000; border: 1px solid #333; padding: 10px; font-size: 0.8rem; border-left: 4px solid var(--red); }
-        .master-only { display: none; }
-        #chat-section { display: none; } /* Chat escondido por padrão */
+        .container { width: 95%; max-width: 850px; background: var(--card); padding: 25px; border: 4px double var(--border); margin: 20px auto; box-shadow: 12px 12px 0px #000; }
+        
+        h2, h3 { font-family: 'Oswald'; text-transform: uppercase; border-left: 5px solid var(--red); padding-left: 10px; margin-bottom: 20px; background: rgba(217, 4, 41, 0.1); }
+        
+        /* INTERFACE QUADRADINHA */
+        input, select, textarea { padding: 15px; margin: 8px 0; border: 2px solid #555; background: #000; color: #0f0; width: 100%; font-size: 16px; font-weight: bold; border-left: 5px solid var(--red); }
+        input:focus { border-color: var(--red); outline: none; }
+        
+        button { background: var(--red); color: white; border: 2px solid #000; padding: 15px; width: 100%; font-family: 'Oswald'; font-size: 1.2rem; text-transform: uppercase; cursor: pointer; margin-top: 10px; box-shadow: 5px 5px 0px #000; transition: 0.1s; }
+        button:active { transform: translate(3px, 3px); box-shadow: 2px 2px 0px #000; }
+        .btn-back { background: #444; margin-bottom: 10px; font-size: 0.8rem; padding: 8px; width: auto; display: inline-block; }
+
+        /* MODAL DE VOLTAR */
+        #modal-back { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-content { background: var(--card); padding: 30px; border: 5px solid var(--red); text-align: center; max-width: 300px; }
+
+        /* GRID RESPONSIVO */
+        #rpg-panel { display: none; width: 98%; max-width: 1400px; margin: 10px auto; grid-template-columns: 1fr; gap: 20px; padding: 10px; }
+        @media (min-width: 1000px) { #rpg-panel { grid-template-columns: 1fr 1.2fr 0.8fr; } }
+
+        .card { background: var(--card); padding: 20px; border: 3px solid #333; position: relative; }
+        .card::before { content: ""; position: absolute; top: -5px; left: -5px; width: 20px; height: 20px; border-top: 4px solid var(--red); border-left: 4px solid var(--red); }
+
+        /* DADO COM IMAGEM */
+        .dice-zone { text-align: center; background: #000; border: 2px dashed var(--red); padding: 20px; margin: 10px 0; }
+        #dice-img { width: 120px; height: 120px; filter: grayscale(20%) contrast(120%); transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        #dice-res { font-family: 'Oswald'; font-size: 2.5rem; color: #fff; text-shadow: 0 0 10px var(--red); margin-top: -30px; position: relative; }
+
+        #chat-box { height: 400px; overflow-y: auto; background: #050505; border: 1px solid #222; padding: 15px; font-size: 0.9rem; line-height: 1.6; border-right: 3px solid var(--red); }
+        .msg { margin-bottom: 8px; border-bottom: 1px solid #111; padding-bottom: 4px; }
+        .msg b { color: var(--red); text-transform: uppercase; font-size: 0.7rem; display: block; }
+
+        .master-only { display: none; border: 1px solid gold; padding: 10px; margin-top: 15px; background: rgba(255, 215, 0, 0.05); }
     </style>
 </head>
 <body>
 
-    <div class="header"><h1>RPG MASTER TACTICAL</h1></div>
+    <div id="modal-back">
+        <div class="modal-content">
+            <h3 style="border:none">Você quer realmente voltar?</h3>
+            <button onclick="confirmarVoltar()" style="background:#2b9348">SIM</button>
+            <button onclick="document.getElementById('modal-back').style.display='none'">NÃO</button>
+        </div>
+    </div>
+
+    <div class="header">
+        <h1>RPG MASTER TACTICAL</h1>
+    </div>
+
+    <div id="nav-bar" style="width:95%; margin: 10px auto; display:none">
+        <button class="btn-back" onclick="abrirModalVoltar()">⬅ VOLTAR TELA</button>
+    </div>
 
     <div id="setup-choice" class="container">
-        <h2>Modo de Jogo</h2>
-        <button onclick="showLobby()">MODO ONLINE (Firebase)</button>
-        <button onclick="showCasual()" style="background:#2b2d42">MODO CASUAL (Local)</button>
+        <h2>Selecione o Protocolo</h2>
+        <button onclick="showLobby()">MODO ONLINE (FIREBASE)</button>
+        <button onclick="showCasual()" style="background:#2b2d42">MODO CASUAL (OFFLINE)</button>
     </div>
 
     <div id="lobby" class="container" style="display:none">
-        <h2>Salas Ativas</h2>
-        <div id="room-list">Carregando salas...</div>
+        <h3>Salas Disponíveis</h3>
+        <div id="room-list">Sincronizando...</div>
         <hr style="border:1px solid #333; margin:20px 0">
-        <h2>Criar Sala</h2>
-        <input type="text" id="new-room-name" placeholder="Nome da Sala">
+        <input type="text" id="new-room-name" placeholder="NOME DA NOVA SALA">
         <select id="new-room-style"></select>
-        <button onclick="criarSala()">Criar como Mestre</button>
+        <button onclick="criarSala()">INICIAR COMO MESTRE</button>
     </div>
 
     <div id="casual-setup" class="container" style="display:none">
-        <h2>Configuração Casual</h2>
-        <label>TEMA</label>
+        <h3>Aventura Local</h3>
+        <label>TEMA DO MUNDO</label>
         <select id="casual-style"></select>
-        <label>QUANTIDADE DE JOGADORES</label>
+        <label>NÚMERO DE HERÓIS</label>
         <input type="number" id="casual-p-count" value="2">
-        <button onclick="setupCasualPlayers()">Gerar Fichas</button>
+        <button onclick="setupCasualPlayers()">CONFIGURAR FICHAS</button>
     </div>
 
     <div id="step-fichas" class="container" style="display:none">
-        <h2 id="ficha-titulo">Criação de Personagens</h2>
+        <h2>Registro de Identidade</h2>
         <div id="inputs-container"></div>
-        <button onclick="finalizarSetup()">Confirmar e Abrir Painel</button>
+        <button onclick="finalizarSetup()">CONCLUIR REGISTRO</button>
     </div>
 
     <div id="rpg-panel">
         <div class="card">
-            <h3>[STATUS DO GRUPO]</h3>
+            <h3>[STATUS OPERACIONAIS]</h3>
             <div id="final-hp-list"></div>
             <div class="master-only">
-                <h3>[NOTAS DO MESTRE]</h3>
-                <textarea id="master-notes" rows="10" placeholder="Anotações privadas..."></textarea>
-                <button onclick="salvarNotas()" id="btn-save-notes">Sincronizar Notas</button>
+                <h3>[ARQUIVOS DO MESTRE]</h3>
+                <textarea id="master-notes" rows="8" placeholder="Escreva a trama aqui..."></textarea>
+                <button onclick="salvarNotas()">SALVAR DADOS</button>
             </div>
         </div>
 
         <div class="card" id="chat-section">
-            <h3>[CHAT]</h3>
+            <h3>[COMUNICAÇÃO]</h3>
             <div id="chat-box"></div>
-            <div style="display:flex; gap:5px; margin-top:5px">
-                <input type="text" id="chat-input" placeholder="Sua fala...">
-                <button onclick="enviarMsg()" style="width:70px; margin:0">OK</button>
+            <div style="display:flex; gap:5px; margin-top:10px">
+                <input type="text" id="chat-input" placeholder="Digite sua mensagem...">
+                <button onclick="enviarMsg()" style="width:80px; margin:0">SEND</button>
             </div>
         </div>
 
-        <div class="card" id="dice-section">
-            <h3>[DADOS]</h3>
-            <div class="master-only-dice">
-                <label>SELECIONAR DADO</label>
-                <select id="dado-seletor">
-                    <option value="20" selected>D20</option><option value="6">D6</option><option value="100">D100</option>
-                </select>
-                <div id="dice-result" style="font-size:3rem; text-align:center; font-family:'Oswald'; color:var(--red); border:2px solid #333; margin:10px 0; background:#000">--</div>
-                <button onclick="rolarDado()">Rolar Dado</button>
+        <div class="card">
+            <h3>[SISTEMA DE DADOS]</h3>
+            <div class="dice-zone">
+                <img src="dado.png" id="dice-img" alt="Dado">
+                <div id="dice-res">--</div>
             </div>
-            <div id="player-dice-msg" style="text-align:center; color:#666; font-size:0.8rem; margin-top:10px">O mestre controla as rolagens oficiais.</div>
+            <div class="master-only" style="display:block">
+                <label>TIPO DE DADO</label>
+                <select id="dado-seletor">
+                    <option value="20">D20 (Padrão)</option>
+                    <option value="6">D6 (Dano)</option>
+                    <option value="100">D100 (Sorte)</option>
+                </select>
+                <button onclick="rolarDado()">EXECUTAR ROLAGEM</button>
+            </div>
         </div>
     </div>
 
@@ -106,20 +142,17 @@
             apiKey: "AIzaSyA3-yiNczMAF4sdZ9kog4ovXc75fciaN2g",
             authDomain: "meudadovirtualok.firebaseapp.com",
             projectId: "meudadovirtualok",
-            storageBucket: "meudadovirtualok.firebasestorage.app",
-            messagingSenderId: "696487273882",
-            appId: "1:696487273882:web:342934592e10b0c66d8623",
             databaseURL: "https://meudadovirtualok-default-rtdb.firebaseio.com/"
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        let isOnline = false, isMaster = false, currentRoom = "", myChar = "", currentStyle = "", localPlayers = [];
+        let isOnline = false, isMaster = false, currentRoom = "", myChar = "", currentStyle = "", localPlayers = [], currentStep = "setup-choice";
 
         const classesData = {
-            jujutsu: ["Feiticeiro Grau 4", "Feiticeiro Grau 1", "Especial", "Restrição Celestial", "Shikigami", "Usuário de Maldição", "Doutor Reverso", "Invocador", "Mestre de Barreiras", "Corpo Amaldiçoado", "Mestre de Ferramentas", "Receptáculo", "Prodígio"],
-            onepiece: ["Logia", "Paramecia", "Zoan", "3 Espadas", "Haki Master", "Mestre de Haki", "Ciborgue", "Navegador", "Sniper", "Cozinheiro", "Arqueólogo", "Músico", "Timoneiro", "Mink"],
-            jojo: ["Stand Curto", "Stand Longo", "Stand Automático", "Stand Cura", "Stand Colônia", "Mestre Hamon", "Vampiro", "Spin User", "Stand Precisão", "Stand Força", "Lutador", "Stand Independente", "Mestre das Sombras"],
+            jujutsu: ["Grau 4", "Grau 1", "Especial", "Restrição Celestial", "Shikigami", "Maldição", "Reverso", "Invocador", "Barreiras", "Corpo Amaldiçoado", "Ferramentas", "Receptáculo", "Prodígio"],
+            onepiece: ["Logia", "Paramecia", "Zoan", "3 Espadas", "Haki Master", "Ciborgue", "Navegador", "Sniper", "Cozinheiro", "Arqueólogo", "Músico", "Timoneiro", "Mink"],
+            jojo: ["Stand Curto", "Stand Longo", "Automático", "Cura", "Colônia", "Hamon", "Vampiro", "Spin User", "Precisão", "Força", "Lutador", "Independente", "Sombras"],
             medieval: ["Guerreiro", "Mago", "Ladino", "Bárbaro", "Bardo", "Clérigo", "Druida", "Paladino", "Monge", "Feiticeiro", "Patrulheiro", "Necromante", "Alquimista"],
             slasher: ["Final Girl", "Atleta", "Nerd", "Popular", "Xerife", "Sobrevivente", "Palhaço", "Monitor", "Estranho", "Médico", "Investigador", "Motorista", "Rebelde"],
             roça: ["Vaqueiro", "Peão", "Benzedeira", "Fazendeiro", "Mateiro", "Violeiro", "Capataz", "Agrônomo", "Veterinário", "Pescador", "Lenhador", "Artesão", "Caminhoneiro"]
@@ -131,20 +164,33 @@
             for(let t in classesData) select.innerHTML += `<option value="${t}">${t.toUpperCase()}</option>`;
         });
 
-        function showLobby() { isOnline = true; document.getElementById('setup-choice').style.display='none'; document.getElementById('lobby').style.display='block'; }
-        function showCasual() { isOnline = false; isMaster = true; document.getElementById('setup-choice').style.display='none'; document.getElementById('casual-setup').style.display='block'; }
+        function changeStep(newStep) {
+            document.getElementById(currentStep).style.display = 'none';
+            document.getElementById(newStep).style.display = (newStep === 'rpg-panel') ? 'grid' : 'block';
+            currentStep = newStep;
+            document.getElementById('nav-bar').style.display = (newStep === 'setup-choice') ? 'none' : 'block';
+        }
+
+        function abrirModalVoltar() { document.getElementById('modal-back').style.display = 'flex'; }
+        function confirmarVoltar() {
+            document.getElementById('modal-back').style.display = 'none';
+            location.reload(); // Forma mais segura de resetar o estado do Firebase e das fichas
+        }
+
+        function showLobby() { isOnline = true; changeStep('lobby'); }
+        function showCasual() { isOnline = false; isMaster = true; changeStep('casual-setup'); }
 
         db.ref('rooms').on('value', snap => {
             const list = document.getElementById('room-list'); list.innerHTML = "";
-            snap.forEach(c => { list.innerHTML += `<div class="room-item"><span>${c.key}</span> <button onclick="entrarSala('${c.key}')" style="width:80px; margin:0; padding:5px; font-size:0.7rem">ENTRAR</button></div>`; });
+            snap.forEach(c => { list.innerHTML += `<button onclick="entrarSala('${c.key}')" style="width:auto; margin:5px; font-size:0.7rem">SALA: ${c.key}</button>`; });
         });
 
         function criarSala() {
             currentRoom = document.getElementById('new-room-name').value;
             currentStyle = document.getElementById('new-room-style').value;
-            if(!currentRoom) return alert("Dê um nome à sala!");
+            if(!currentRoom) return;
             isMaster = true;
-            db.ref('rooms/'+currentRoom).set({ style: currentStyle, master: true });
+            db.ref('rooms/'+currentRoom).set({ style: currentStyle });
             abrirFichas(currentStyle, 1);
         }
 
@@ -154,25 +200,24 @@
         }
 
         function abrirFichas(style, qtd) {
-            document.getElementById('lobby').style.display='none';
-            document.getElementById('casual-setup').style.display='none';
-            document.getElementById('step-fichas').style.display='block';
+            changeStep('step-fichas');
             const container = document.getElementById('inputs-container');
             container.innerHTML = "";
             const classes = classesData[style];
             for(let i=0; i<qtd; i++) {
                 let options = classes.map(c => `<option>${c}</option>`).join('');
                 container.innerHTML += `
-                    <div class="ficha-input-box">
-                        <div class="full-width" style="color:var(--red); font-size:0.7rem; border-bottom:1px solid #333">PERSONAGEM ${i+1}</div>
-                        <input type="text" class="in-nome full-width" placeholder="Nome do Personagem">
-                        <select class="in-classe">${options}</select>
-                        <input type="text" class="in-altura" placeholder="Altura">
-                        <input type="text" class="in-peso" placeholder="Peso">
-                        <div class="full-width">
-                            <label>Vida (HP Inicial)</label>
-                            <input type="number" class="in-hp" value="100">
+                    <div style="border:2px solid #555; padding:15px; margin-bottom:20px; background:#000">
+                        <label>NOME DO PERSONAGEM</label>
+                        <input type="text" class="in-nome" placeholder="Ex: Sukuna">
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px">
+                            <div><label>ALTURA</label><input type="text" class="in-altura" placeholder="1.85m"></div>
+                            <div><label>PESO</label><input type="text" class="in-peso" placeholder="80kg"></div>
                         </div>
+                        <label>CLASSE / TIPO</label>
+                        <select class="in-classe">${options}</select>
+                        <label style="color:var(--red)">VIDA (HP INICIAL)</label>
+                        <input type="number" class="in-hp" value="100">
                     </div>`;
             }
         }
@@ -184,37 +229,28 @@
         }
 
         function finalizarSetup() {
-            const boxes = document.querySelectorAll('.ficha-input-box');
+            const boxes = document.querySelectorAll('.in-nome');
+            const hps = document.querySelectorAll('.in-hp');
+            const classes = document.querySelectorAll('.in-classe');
+            const alts = document.querySelectorAll('.in-altura');
+            const weights = document.querySelectorAll('.in-peso');
+
             if(isOnline) {
-                const b = boxes[0]; myChar = b.querySelector('.in-nome').value || "Anônimo";
+                myChar = boxes[0].value || "Player";
                 db.ref(`rooms/${currentRoom}/players/${myChar}`).set({
-                    nome: myChar, classe: b.querySelector('.in-classe').value, 
-                    altura: b.querySelector('.in-altura').value || "N/A",
-                    peso: b.querySelector('.in-peso').value || "N/A",
-                    hp: parseInt(b.querySelector('.in-hp').value), max: parseInt(b.querySelector('.in-hp').value)
+                    nome: myChar, classe: classes[0].value, altura: alts[0].value, peso: weights[0].value, hp: parseInt(hps[0].value), max: parseInt(hps[0].value)
                 });
-                document.getElementById('chat-section').style.display = 'block';
             } else {
                 localPlayers = [];
-                boxes.forEach(b => {
-                    localPlayers.push({
-                        nome: b.querySelector('.in-nome').value || "Herói",
-                        classe: b.querySelector('.in-classe').value,
-                        altura: b.querySelector('.in-altura').value || "N/A",
-                        peso: b.querySelector('.in-peso').value || "N/A",
-                        hp: parseInt(b.querySelector('.in-hp').value), max: parseInt(b.querySelector('.in-hp').value)
-                    });
+                boxes.forEach((b, i) => {
+                    localPlayers.push({ nome: b.value, classe: classes[i].value, altura: alts[i].value, peso: weights[i].value, hp: parseInt(hps[i].value), max: parseInt(hps[i].value) });
                 });
-                myChar = "Mestre Local";
+                myChar = "MESTRE";
+                document.getElementById('chat-section').style.display = 'none';
             }
-            document.getElementById('step-fichas').style.display='none';
-            document.getElementById('rpg-panel').style.display='grid';
             
-            // Controle de mestre
-            if(isMaster) {
-                document.querySelectorAll('.master-only').forEach(e => e.style.display = 'block');
-                document.getElementById('player-dice-msg').style.display = 'none';
-            }
+            changeStep('rpg-panel');
+            if(isMaster) document.querySelectorAll('.master-only').forEach(e => e.style.display = 'block');
             iniciarPainel();
         }
 
@@ -225,20 +261,20 @@
                     snap.forEach(child => {
                         const p = child.val(); const pct = (p.hp/p.max)*100;
                         list.innerHTML += `
-                            <div style="border:1px solid #444; padding:15px; margin-bottom:15px; background:#000">
-                                <div style="display:flex; justify-content:space-between"><b>${p.nome}</b> <span>${p.hp}/${p.max} HP</span></div>
-                                <div style="font-size:0.7rem; color:#888; margin:5px 0">${p.classe} | ${p.altura} | ${p.peso}</div>
-                                <div class="hp-bar-bg"><div class="hp-bar-fill" style="width:${pct}%"></div></div>
-                                ${isMaster ? `<div style="display:flex; gap:5px"><button onclick="updateHPOnline('${p.nome}', -10)" style="flex:1; margin:0">-10 HP</button><button onclick="updateHPOnline('${p.nome}', 10)" style="flex:1; margin:0; background:#1b4332">+10 HP</button></div>` : ''}
+                            <div style="border:1px solid #444; padding:12px; margin-bottom:12px; background:rgba(0,0,0,0.5)">
+                                <div style="display:flex; justify-content:space-between; font-size:0.8rem"><b>${p.nome}</b> <span>${p.hp}/${p.max} HP</span></div>
+                                <div style="font-size:0.6rem; color:#888; margin-bottom:5px">${p.classe} | ${p.altura} | ${p.peso}</div>
+                                <div style="height:12px; background:#111; border:1px solid #000"><div style="height:100%; background:var(--red); width:${pct}%"></div></div>
+                                ${isMaster ? `<div style="display:flex; gap:5px; margin-top:8px"><button onclick="updateHPOnline('${p.nome}', -10)" style="padding:5px; font-size:0.7rem">-10 HP</button><button onclick="updateHPOnline('${p.nome}', 10)" style="padding:5px; font-size:0.7rem; background:#1b4332">+10 HP</button></div>` : ''}
                             </div>`;
                     });
                 });
-                db.ref(`rooms/${currentRoom}/chat`).on('value', snap => {
+                db.ref(`rooms/${currentRoom}/chat`).limitToLast(15).on('value', snap => {
                     const box = document.getElementById('chat-box'); box.innerHTML = "";
-                    snap.forEach(c => box.innerHTML += `<div><b>${c.val().user}:</b> ${c.val().text}</div>`);
+                    snap.forEach(c => box.innerHTML += `<div class="msg"><b>${c.val().user}</b> ${c.val().text}</div>`);
                     box.scrollTop = box.scrollHeight;
                 });
-                db.ref(`rooms/${currentRoom}/notes`).on('value', snap => { if(snap.val()) document.getElementById('master-notes').value = snap.val(); });
+                db.ref(`rooms/${currentRoom}/dice`).on('value', snap => { if(snap.val()) document.getElementById('dice-res').innerText = snap.val(); });
             } else {
                 renderPlayersLocal();
             }
@@ -248,32 +284,40 @@
             const list = document.getElementById('final-hp-list'); list.innerHTML = "";
             localPlayers.forEach((p, i) => {
                 const pct = (p.hp/p.max)*100;
-                list.innerHTML += `<div style="border:1px solid #444; padding:15px; margin-bottom:15px; background:#000">
-                    <div style="display:flex; justify-content:space-between"><b>${p.nome}</b> <span>${p.hp}/${p.max} HP</span></div>
-                    <div style="font-size:0.7rem; color:#888; margin:5px 0">${p.classe} | ${p.altura} | ${p.peso}</div>
-                    <div class="hp-bar-bg"><div class="hp-bar-fill" style="width:${pct}%"></div></div>
-                    <div style="display:flex; gap:5px"><button onclick="updateHPLocal(${i}, -10)" style="flex:1; margin:0">-10 HP</button><button onclick="updateHPLocal(${i}, 10)" style="flex:1; margin:0; background:#1b4332">+10 HP</button></div>
+                list.innerHTML += `<div style="border:1px solid #444; padding:12px; margin-bottom:12px">
+                    <b>${p.nome}</b> | ${p.hp} HP
+                    <div style="height:12px; background:#111; border:1px solid #000"><div style="height:100%; background:var(--red); width:${pct}%"></div></div>
+                    <div style="display:flex; gap:5px; margin-top:8px"><button onclick="updateHPLocal(${i}, -10)" style="padding:5px">-10 HP</button><button onclick="updateHPLocal(${i}, 10)" style="padding:5px; background:#1b4332">+10 HP</button></div>
                 </div>`;
             });
         }
 
         function updateHPOnline(name, val) { db.ref(`rooms/${currentRoom}/players/${name}/hp`).transaction(c => Math.max(0, (c||0) + val)); }
-        function updateHPLocal(i, val) { localPlayers[i].hp = Math.max(0, Math.min(localPlayers[i].max, localPlayers[i].hp + val)); renderPlayersLocal(); }
-        
+        function updateHPLocal(i, val) { localPlayers[i].hp = Math.max(0, localPlayers[i].hp + val); renderPlayersLocal(); }
+
         function enviarMsg() {
-            const t = document.getElementById('chat-input').value; if(!t) return;
-            db.ref(`rooms/${currentRoom}/chat`).push({user: myChar, text: t});
-            document.getElementById('chat-input').value = "";
+            const input = document.getElementById('chat-input');
+            if(!input.value) return;
+            db.ref(`rooms/${currentRoom}/chat`).push({user: myChar, text: input.value});
+            input.value = "";
         }
 
         function rolarDado() {
             const d = document.getElementById('dado-seletor').value;
             const res = Math.floor(Math.random() * d) + 1;
-            document.getElementById('dice-result').innerText = res;
-            if(isOnline) db.ref(`rooms/${currentRoom}/chat`).push({user: "SISTEMA", text: `Mestre rolou D${d}: [${res}]`});
+            const img = document.getElementById('dice-img');
+            img.style.transform = "rotate(720deg) scale(0.8)";
+            setTimeout(() => {
+                img.style.transform = "rotate(0deg) scale(1)";
+                document.getElementById('dice-res').innerText = res;
+                if(isOnline) {
+                    db.ref(`rooms/${currentRoom}/dice`).set(res);
+                    db.ref(`rooms/${currentRoom}/chat`).push({user: "SISTEMA", text: `🎲 ROLAGEM D${d}: [${res}]`});
+                }
+            }, 600);
         }
 
-        function salvarNotas() { if(isOnline) db.ref(`rooms/${currentRoom}/notes`).set(document.getElementById('master-notes').value); }
+        function salvarNotas() { db.ref(`rooms/${currentRoom}/notes`).set(document.getElementById('master-notes').value); }
     </script>
 </body>
 </html>
