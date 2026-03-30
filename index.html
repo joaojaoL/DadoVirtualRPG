@@ -3,255 +3,238 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HUB RPG - AURAMAX</title>
+    <title>RPG SYSTEM - DADOS E FICHAS</title>
     <style>
         :root {
-            --vermelho: #ff0000;
-            --azul: #0044ff;
-            --preto: #050505;
-            --cinza: #1a1a1a;
-            --borda: 3px solid #333;
+            --vermelho: #E60000;
+            --azul: #0044CC;
+            --preto: #000000;
+            --cinza: #121212;
+            --borda: 4px solid #fff;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
             background-color: var(--preto);
-            color: white;
-            font-family: 'Courier New', Courier, monospace;
+            color: #fff;
+            font-family: 'Impact', 'Arial Black', sans-serif;
             padding: 10px;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
 
-        .painel {
+        /* CONTAINER QUADRADÃO */
+        .box {
             background: var(--cinza);
-            border: 4px solid var(--azul);
+            border: 5px solid var(--azul);
             width: 100%;
-            max-width: 1000px;
+            max-width: 1100px;
             padding: 20px;
             box-shadow: 10px 10px 0px var(--vermelho);
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
 
-        h1, h2 {
-            text-transform: uppercase;
-            text-align: center;
-            margin-bottom: 20px;
+        h1 {
             background: var(--vermelho);
-            color: black;
-            padding: 5px;
-        }
-
-        /* Form Estilizado */
-        .setup-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
+            text-align: center;
+            padding: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
             margin-bottom: 20px;
+            border: 2px solid #000;
         }
 
-        label { display: block; font-weight: bold; margin-bottom: 5px; color: var(--azul); }
+        .pergunta { margin-bottom: 15px; }
+        label { display: block; color: var(--azul); margin-bottom: 5px; font-size: 14px; }
 
         select, input {
             width: 100%;
-            background: #000;
-            border: 2px solid var(--vermelho);
-            color: white;
             padding: 12px;
-            font-size: 1rem;
-            border-radius: 0; /* Quadradão */
-        }
-
-        button {
-            width: 100%;
-            padding: 15px;
-            background: var(--azul);
-            color: white;
-            border: none;
-            font-weight: bold;
-            font-size: 1.2rem;
-            cursor: pointer;
-            text-transform: uppercase;
-            border: 3px solid white;
-        }
-
-        button:hover { background: var(--vermelho); color: black; }
-
-        /* Area de Jogo */
-        #gameArea { display: none; width: 100%; max-width: 1200px; }
-
-        .dice-section {
-            text-align: center;
-            padding: 20px;
-            border: 4px solid var(--vermelho);
-            margin-bottom: 20px;
             background: #000;
+            border: 3px solid var(--vermelho);
+            color: #fff;
+            font-family: sans-serif;
+            font-weight: bold;
+            border-radius: 0;
         }
 
-        #d20 {
-            width: 120px;
-            filter: drop-shadow(0 0 10px var(--vermelho));
+        .btn-start {
+            width: 100%;
+            padding: 20px;
+            background: var(--azul);
+            color: #fff;
+            border: 4px solid #fff;
             cursor: pointer;
-            transition: transform 0.1s;
+            font-size: 1.5rem;
+            margin-top: 10px;
         }
 
-        #d20:active { transform: scale(0.8); }
+        .btn-start:hover { background: var(--vermelho); }
 
-        .result { font-size: 4rem; color: var(--azul); margin: 10px 0; font-weight: bold; }
+        /* MESA DE JOGO */
+        #gameScreen { display: none; width: 100%; max-width: 1200px; }
 
-        /* Grid de Fichas */
-        .fichas-container {
+        .dice-zone {
+            text-align: center;
+            border: 5px solid var(--vermelho);
+            padding: 20px;
+            background: #000;
+            margin-bottom: 20px;
+        }
+
+        #dadoImg {
+            width: 130px;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+
+        #dadoImg:active { transform: scale(0.9) rotate(15deg); }
+
+        .roll-result {
+            font-size: 5rem;
+            color: var(--azul);
+            text-shadow: 4px 4px 0px #fff;
+        }
+
+        /* GRID DE FICHAS */
+        .fichas-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 20px;
         }
 
-        .ficha-card {
-            background: #0a0a0a;
-            border: 2px solid var(--azul);
+        .ficha {
+            background: #080808;
+            border: 3px solid var(--azul);
             padding: 15px;
-            position: relative;
         }
 
-        .ficha-card h3 {
+        .ficha-head {
             background: var(--azul);
-            font-size: 0.9rem;
-            padding: 3px;
-            margin-bottom: 10px;
+            padding: 5px;
+            margin-bottom: 15px;
+            font-size: 12px;
+            text-align: center;
         }
 
-        .ficha-inputs {
+        .campos {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 8px;
+            gap: 10px;
         }
 
-        .ficha-inputs input, .ficha-inputs select {
-            font-size: 0.8rem;
-            padding: 8px;
-        }
-
-        .full-width { grid-column: span 2; }
+        .span2 { grid-column: span 2; }
 
         @media (max-width: 600px) {
-            .fichas-container { grid-template-columns: 1fr; }
-            .result { font-size: 3rem; }
+            .fichas-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
-    <div class="painel" id="setupForm">
-        <h1>CONFIGURAÇÃO INICIAL</h1>
-        <div class="setup-grid">
-            <div>
-                <label>ESTILO</label>
-                <select id="estilo">
-                    <option value="jjk">Jujutsu Kaisen</option>
-                    <option value="jojo">JoJo's Bizarre Adventure</option>
-                    <option value="onepiece">One Piece</option>
-                    <option value="medieval">Medieval</option>
-                    <option value="slasher">Slasher</option>
-                    <option value="sobrenatural">Sobrenatural</option>
-                    <option value="misterioso">Misterioso</option>
-                </select>
-            </div>
-            <div>
-                <label>PLAYERS (1-15)</label>
-                <input type="number" id="numPlayers" min="1" max="15" value="1">
-            </div>
-            <div>
-                <label>ONE SHOT?</label>
-                <select id="oneshot">
-                    <option>SIM</option>
-                    <option>NÃO</option>
-                </select>
-            </div>
-            <div>
-                <label>DURAÇÃO</label>
-                <select id="duracao"></select>
-            </div>
+    <div class="box" id="setup">
+        <h1>CONFIGURAR RPG</h1>
+        <div class="pergunta">
+            <label>ESTILO DO MUNDO</label>
+            <select id="estilo">
+                <option value="jojo">JoJo's Bizarre Adventure</option>
+                <option value="jjk">Jujutsu Kaisen</option>
+                <option value="paranormal">Paranormal / Sobrenatural</option>
+                <option value="medieval">Medieval Fantasia</option>
+                <option value="onepiece">One Piece</option>
+                <option value="slasher">Slasher (Terror)</option>
+            </select>
         </div>
-        <button onclick="gerarMesa()">GERAR MESA DE RPG</button>
+        <div class="pergunta">
+            <label>NÚMERO DE PLAYERS (1-15)</label>
+            <input type="number" id="players" min="1" max="15" value="1">
+        </div>
+        <div class="pergunta">
+            <label>É UMA ONE SHOT?</label>
+            <select id="oneshot">
+                <option>SIM</option>
+                <option>NÃO</option>
+            </select>
+        </div>
+        <div class="pergunta">
+            <label>DURAÇÃO APROXIMADA</label>
+            <select id="tempo"></select>
+        </div>
+        <button class="btn-start" onclick="iniciarMesa()">ABRIR MESA</button>
     </div>
 
-    <div id="gameArea">
-        <div class="dice-section">
-            <img src="dado.png" id="d20" alt="Dado" onclick="rolarDado()">
-            <div class="result" id="resultado">--</div>
-            <p style="color: var(--azul)">CLIQUE NO DADO PARA ROLAR</p>
+    <div id="gameScreen">
+        <div class="dice-zone">
+            <img src="dado.png" id="dadoImg" alt="DADO" onclick="rolar()">
+            <div class="roll-result" id="res">--</div>
+            <p>CLIQUE NO DADO PARA ROLAR</p>
         </div>
-
-        <h2 id="tituloEstilo">FICHAS DOS JOGADORES</h2>
-        <div class="fichas-container" id="containerFichas"></div>
+        <div class="fichas-grid" id="fichasContainer"></div>
     </div>
 
     <script>
-        // Preencher dias
-        const duracao = document.getElementById('duracao');
+        // Gerar 30 dias no select
+        const t = document.getElementById('tempo');
         for(let i=1; i<=30; i++) {
-            let opt = document.createElement('option');
-            opt.innerHTML = i + (i < 30 ? " Dias" : " Mês");
-            duracao.appendChild(opt);
+            let o = document.createElement('option');
+            o.text = i + (i==30 ? " Mês" : " Dias");
+            t.add(o);
         }
 
         const classesDB = {
-            jjk: ["Feiticeiro Graus 4-1", "Restrição Celestial", "Controlador de Sangue", "Usuário de Shikigami", "Mestre de Barreiras", "Inversão de Técnica", "Vaso de Maldição", "Xamã", "Lutador de Taijutsu", "Mestre de Ferramentas", "Discurso Amaldiçoado", "Transfiguração", "Projetista"],
-            jojo: ["Stand Curto Alcance", "Stand Longo Alcance", "Stand Automático", "Hamon User", "Vampiro", "Ciborgue", "Spin Master", "Stand Utilitário", "Stand de Tempo", "Stand de Fenômeno", "Lutador", "Estrategista", "Stand de Cura"],
-            onepiece: ["Espadachim", "Lutador de Tritão", "Cozinheiro", "Atirador", "Navegador", "Médico", "Arqueólogo", "Carpinteiro", "Músico", "Cientista", "Timoneiro", "Mink", "Gigante"],
-            medieval: ["Guerreiro", "Mago", "Ladino", "Clérigo", "Bárbaro", "Paladino", "Arqueiro", "Druida", "Bardo", "Monge", "Feiticeiro", "Bruxo", "Cavaleiro"]
+            jojo: ["Stand Curto Alcance", "Stand Longo Alcance", "Stand Automático", "Stand de Cura", "Stand de Reconhecimento", "Stand de Tempo", "Stand de Espaço", "Usuário de Hamon", "Vampiro", "Ciborgue Alemão", "Mestre do Spin", "Stand Fenômeno", "Usuário de Objeto Amaldiçoado"],
+            jjk: ["Feiticeiro de Grau Especial", "Feiticeiro Grau 1", "Usuário de Shikigami", "Restrição Celestial (Física)", "Restrição Celestial (Energia)", "Manipulador de Sangue", "Mestre de Barreiras", "Discurso Amaldiçoado", "Técnica de Projeção", "Usuário de Ferramentas", "Vaso de Maldição", "Mestre de Taijutsu", "Médico de Técnica Reversa"],
+            paranormal: ["Exorcista", "Médium", "Detetive Espiritual", "Caçador de Monstros", "Ocultista", "Inquisidor", "Cientista Paranormal", "Possuído (Controlado)", "Ceifador", "Vidente", "Relicário Vivo", "Necromante", "Andarilho do Purgatório"],
+            medieval: ["Guerreiro", "Mago", "Ladino", "Clérigo", "Paladino", "Bárbaro", "Arqueiro", "Druida", "Bardo", "Monge", "Bruxo", "Feiticeiro", "Cavaleiro Real"],
+            onepiece: ["Espadachim (Santoryu/Nitoryu)", "Atirador", "Cozinheiro de Combate", "Médico Pirata", "Navegador Habilidoso", "Arqueólogo", "Carpinteiro", "Músico", "Lutador Tritão", "Mink Guerreiro", "Cientista Fora da Lei", "Timoneiro de Elite", "Gigante"],
+            slasher: ["Sobrevivente (Final Girl/Boy)", "O Atleta", "O Nerd", "A Vítima Popular", "O Policial da Cidade", "O Cético", "Monitor de Acampamento", "O Gótico", "Jornalista Investigativo", "Mecânico de Estrada", "Vagabundo Local", "O Jocker (Alívio Cômico)", "Ex-Militar"]
         };
 
-        function gerarMesa() {
-            const num = document.getElementById('numPlayers').value;
+        function iniciarMesa() {
             const estilo = document.getElementById('estilo').value;
-            const container = document.getElementById('containerFichas');
+            const num = document.getElementById('players').value;
+            const container = document.getElementById('fichasContainer');
             
-            document.getElementById('setupForm').style.display = 'none';
-            document.getElementById('gameArea').style.display = 'block';
-            document.getElementById('tituloEstilo').innerText = "CAMPANHA: " + estilo.toUpperCase();
+            document.getElementById('setup').style.display = 'none';
+            document.getElementById('gameScreen').style.display = 'block';
+
+            let labelEspecial = "HABILIDADE";
+            if(estilo === 'jjk') labelEspecial = "ENERGIA AMALDIÇOADA";
+            if(estilo === 'jojo') labelEspecial = "NOME DO STAND";
+            if(estilo === 'onepiece') labelEspecial = "AKUMA NO MI (FRUTA)";
 
             container.innerHTML = "";
-
             for(let i=1; i<=num; i++) {
-                const card = document.createElement('div');
-                card.className = 'ficha-card';
-                
-                // Define campo especial
-                let especialLabel = "HABILIDADE";
-                if(estilo === 'jjk') especialLabel = "ENERGIA AMALDIÇOADA";
-                if(estilo === 'jojo') especialLabel = "STAND";
-                if(estilo === 'onepiece') especialLabel = "FRUTA (OU ESTILO)";
-
-                // Pega classes (ou usa padrão se não tiver no DB)
-                const listaClasses = classesDB[estilo] || ["Classe 1", "Classe 2", "Classe 3", "Classe 4", "Classe 5", "Classe 6", "Classe 7", "Classe 8", "Classe 9", "Classe 10", "Classe 11", "Classe 12", "Classe 13"];
-                let optionsClasses = listaClasses.map(c => `<option>${c}</option>`).join('');
-
-                card.innerHTML = `
-                    <h3>PLAYER ${i}</h3>
-                    <div class="ficha-inputs">
+                let clHtml = classesDB[estilo].map(c => `<option>${c}</option>`).join('');
+                let f = document.createElement('div');
+                f.className = "ficha";
+                f.innerHTML = `
+                    <div class="ficha-head">PLAYER #0${i} - ${estilo.toUpperCase()}</div>
+                    <div class="campos">
                         <input type="text" placeholder="Nome">
                         <input type="text" placeholder="Idade">
                         <input type="text" placeholder="Altura">
-                        <select>${optionsClasses}</select>
-                        <input type="text" class="full-width" placeholder="${especialLabel}">
+                        <select>${clHtml}</select>
+                        <input type="text" class="span2" placeholder="${labelEspecial}">
                     </div>
                 `;
-                container.appendChild(card);
+                container.appendChild(f);
             }
         }
 
-        function rolarDado() {
-            const display = document.getElementById('resultado');
-            let count = 0;
-            const intervalo = setInterval(() => {
-                display.innerText = Math.floor(Math.random() * 20) + 1;
-                count++;
-                if(count > 10) {
-                    clearInterval(intervalo);
-                    display.style.color = (display.innerText == "20") ? "gold" : (display.innerText == "1" ? "red" : "var(--azul)");
+        function rolar() {
+            const res = document.getElementById('res');
+            let i = 0;
+            const anim = setInterval(() => {
+                res.innerText = Math.floor(Math.random() * 20) + 1;
+                i++;
+                if(i > 10) {
+                    clearInterval(anim);
+                    let final = Math.floor(Math.random() * 20) + 1;
+                    res.innerText = final;
+                    res.style.color = (final == 20) ? "#00FF00" : (final == 1 ? "#E60000" : "var(--azul)");
                 }
             }, 50);
         }
